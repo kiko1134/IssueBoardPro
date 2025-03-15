@@ -175,10 +175,10 @@ This project follows a structured Git workflow to maintain code quality and simp
 
 5. Once approved, merge the changes into the `dev` branch:
 
-```bash
-        git checkout dev
-        git merge feature/new-feature
-```
+    ```bash
+    git checkout dev
+    git merge feature/new-feature
+    ```
 
 6. Delete the feature branch:
 
