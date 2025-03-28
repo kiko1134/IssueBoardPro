@@ -1,26 +1,44 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {Layout} from 'antd';
+import HeaderContent from "./components/HeaderContent";
+import SiderContent from "./components/SiderContent";
+import IssueBoardIndexPage from "./components/IssueBoard/IssueBoardIndexPage";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const {Header, Sider, Content} = Layout;
 
-export default App;
+const IssueTrackerLayout: React.FC = () => {
+
+
+    return (
+        <Layout style={{minHeight: '100vh'}}>
+            {/* Header */}
+            <Header
+                style={{
+                    backgroundColor: '#fff',
+                    padding: '0 16px',
+                    borderBottom: '1px solid #f0f0f0'
+                }}
+            >
+                <HeaderContent/>
+            </Header>
+
+            {/* Body: Sider + Content */}
+            <Layout>
+                <Sider
+                    // collapsible
+                    width={200}
+                    style={{background: '#f0f2f5', padding: '10px'}}
+                >
+                    <SiderContent/>
+                </Sider>
+
+                <Content style={{padding: '10px'}}>
+                    <IssueBoardIndexPage/>
+                </Content>
+            </Layout>
+        </Layout>
+    );
+};
+
+export default IssueTrackerLayout;
+
