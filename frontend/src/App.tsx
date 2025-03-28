@@ -1,7 +1,7 @@
 import React from 'react';
 import {Layout} from 'antd';
-import HeaderContent from "./components/HeaderContent";
-import SiderContent from "./components/SiderContent";
+import HeaderContent from "./components/layout/HeaderContent";
+import SiderContent from "./components/layout/SiderContent";
 import IssueBoardIndexPage from "./components/IssueBoard/IssueBoardIndexPage";
 
 const {Header, Sider, Content} = Layout;

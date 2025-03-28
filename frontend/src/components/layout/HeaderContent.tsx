@@ -1,13 +1,18 @@
-import {Button} from "antd";
+import {Button, Dropdown, Menu} from "antd";
 import {DownOutlined, PlusOutlined} from "@ant-design/icons";
 import React from "react";
+
+const menuItems = [
+    { label: "Project 1", key: "1" },
+    { label: "Project 2", key: "2" },
+    { label: "Project 3", key: "3" },
+];
 
 
 const HeaderContent: React.FC = () => {
 
     return (
         <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
-            {/* Left side of header: Title, Projects dropdown, Create button */}
             <div
                 style={{
                     fontSize: '20px',
@@ -18,9 +23,15 @@ const HeaderContent: React.FC = () => {
                 Issue Tracker
             </div>
 
-            <Button type="text" style={{marginRight: '16px'}}>
-                Projects <DownOutlined/>
-            </Button>
+            {/*<Button type="text" style={{marginRight: '16px'}}>*/}
+            {/*    Projects <DownOutlined/>*/}
+            {/*</Button>*/}
+
+            <Dropdown menu={{items: menuItems}} trigger={["click"]}>
+                <Button type="text" style={{ marginRight: "16px" }}>
+                    Projects <DownOutlined />
+                </Button>
+            </Dropdown>
 
             <Button
                 type="primary"
@@ -29,11 +40,7 @@ const HeaderContent: React.FC = () => {
             >
                 Create Project
             </Button>
-
-            {/*This should be over the content*/}
-
-            {/* Right side of header: CV button */}
-            <Button>CV</Button>
+            <Button style={{ marginLeft: 'auto' }}>CV</Button>
         </div>
     )
 }
