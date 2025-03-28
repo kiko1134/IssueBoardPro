@@ -28,9 +28,9 @@ const IssueTrackerLayout: React.FC = () => {
             {/* Body: Sider + Content */}
             {selectedProject.length > 0 ? <Layout>
                     <Sider
-                        // collapsible
+                        collapsible
                         width={200}
-                        style={{background: '#f0f2f5', padding: '10px'}}
+                        style={{}}
                     >
                         <SiderContent projectName={selectedProject}/>
                     </Sider>
