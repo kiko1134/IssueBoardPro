@@ -1,19 +1,39 @@
-const sequelize = require('../config/database'); // Взима конфигурацията на базата
-const User = require('./user'); // Импортира модела User
-const Project = require('./project'); // Импортира модела Project
-const Issue = require('./issue'); // Импортира модела Issue
-const Note = require('./note'); // Импортира модела Note
+const sequelize = require('../config/database');
 
-User.hasMany(Issue, { foreignKey: 'assignedTo', as: 'AssignedIssues' });
-User.hasMany(Issue, { foreignKey: 'assignedBy', as: 'CreatedIssues' });
-Project.hasMany(Issue, { foreignKey: 'projectId', as: 'ProjectIssues' });
-Issue.hasMany(Note, { foreignKey: 'issueId', as: 'IssueNotes' });
-User.hasMany(Note, { foreignKey: 'userId', as: 'UserNotes' });
+const Issue = require('./issue');
+const Note = require('./note');
+const Project = require('./project');
+const Status = require('./status');
+const User = require('./user');
 
-Issue.belongsTo(User, { foreignKey: 'assignedTo', as: 'AssignedUser' });
-Issue.belongsTo(User, { foreignKey: 'assignedBy', as: 'CreatorUser' });
-Issue.belongsTo(Project, { foreignKey: 'projectId', as: 'Project' });
-Note.belongsTo(Issue, { foreignKey: 'issueId', as: 'Issue' });
-Note.belongsTo(User, { foreignKey: 'userId', as: 'Author' });
+// === Associations ===
 
-module.exports = { sequelize, User, Project, Issue, Note };
+// Issue belongs to Project, Status, User (assignedTo, assignedBy)
+Issue.belongsTo(Project, { foreignKey: 'projectId' });
+Project.hasMany(Issue, { foreignKey: 'projectId' });
+
+Issue.belongsTo(Status, { foreignKey: 'statusId' });
+Status.hasMany(Issue, { foreignKey: 'statusId' });
+
+Issue.belongsTo(User, { as: 'Assignee', foreignKey: 'assignedTo' });
+Issue.belongsTo(User, { as: 'Assigner', foreignKey: 'assignedBy' });
+User.hasMany(Issue, { as: 'AssignedIssues', foreignKey: 'assignedTo' });
+User.hasMany(Issue, { as: 'GivenIssues', foreignKey: 'assignedBy' });
+
+// Note belongs to Issue and User
+Note.belongsTo(Issue, { foreignKey: 'issueId' });
+Issue.hasMany(Note, { foreignKey: 'issueId' });
+
+Note.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Note, { foreignKey: 'userId' });
+
+// === Export models ===
+
+module.exports = {
+    sequelize,
+    Issue,
+    Note,
+    Project,
+    Status,
+    User
+};

@@ -3,13 +3,32 @@ const sequelize = require('../config/database');
 
 const Issue = sequelize.define('Issue', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    title: { type: DataTypes.STRING, allowNull: false },
+    title: { type: DataTypes.STRING(20), allowNull: false },
     description: { type: DataTypes.TEXT },
-    status: { type: DataTypes.STRING, allowNull: false },
-    projectId: { type: DataTypes.INTEGER, references: { model: 'Projects', key: 'id' } },
-    assignedTo: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'id' } },
-    assignedBy: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'id' } },
-    dueDate: { type: DataTypes.DATE, allowNull: true }
+    statusId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'Status', key: 'id' }
+    },
+    projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'Project', key: 'id' }
+    },
+    assignedTo: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'User', key: 'id' }
+    },
+    assignedBy: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'User', key: 'id' }
+    },
+    dueDate: { type: DataTypes.DATE, allowNull: true },
+    worklog: {
+        type: DataTypes.FLOAT,
+    }
 });
 
 module.exports = Issue;
