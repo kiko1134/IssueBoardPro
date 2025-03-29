@@ -39,4 +39,12 @@ const Issue = sequelize.define('Issue', {
     }
 });
 
+Issue.associate = (models) => {
+    Issue.belongsTo(models.Project, { foreignKey: 'projectId' });
+    Issue.belongsTo(models.Status, { foreignKey: 'statusId' });
+    Issue.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'Assignee' });
+    Issue.belongsTo(models.User, { foreignKey: 'assignedBy', as: 'Reporter' });
+    Issue.hasMany(models.Note, { foreignKey: 'issueId' });
+};
+
 module.exports = Issue;

@@ -23,4 +23,9 @@ const Note = sequelize.define('Note', {
     }
 });
 
+Note.associate = (models) => {
+    Note.belongsTo(models.Issue, { foreignKey: 'issueId' });
+    Note.belongsTo(models.User, { foreignKey: 'userId' });
+};
+
 module.exports = Note;

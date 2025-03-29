@@ -17,4 +17,8 @@ const Status = sequelize.define('Status', {
     timestamps: false
 });
 
+Status.associate = (models) => {
+    Status.hasMany(models.Issue, { foreignKey: 'statusId' });
+};
+
 module.exports = Status;
