@@ -25,7 +25,15 @@ const Issue = sequelize.define('Issue', {
         allowNull: false,
         references: { model: 'User', key: 'id' }
     },
-    dueDate: { type: DataTypes.DATE, allowNull: true },
+    dueDate: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    priority: {
+        type: DataTypes.ENUM('Low', 'Medium', 'High'),
+        allowNull: false,
+        defaultValue: 'Medium'
+    },
     worklog: {
         type: DataTypes.FLOAT,
     }
