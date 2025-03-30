@@ -35,7 +35,7 @@ const Issue = sequelize.define('Issue', {
         defaultValue: 'Medium'
     },
     type: {
-        type: DataTypes.ENUM('bug', 'feature', 'task'),
+        type: DataTypes.ENUM('Bug', 'Feature', 'Task'),
         allowNull: false
     },
     worklog: {
