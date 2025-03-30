@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import {Layout} from 'antd';
+import HeaderContent from "./components/layout/HeaderContent";
+import SiderContent from "./components/layout/SiderContent";
+import IssueBoardIndexPage from "./components/IssueBoard/IssueBoardIndexPage";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const {Header, Sider, Content} = Layout;
 
-export default App;
+const IssueTrackerLayout: React.FC = () => {
+
+    //For the moment at the start of the app the state is empty string and only header is displayed. When project selected from header it load the sider and content.
+    const [selectedProject, setSelectedProject] = useState<string>("");
+
+
+    return (
+        <Layout style={{height: '100vh', overflow: 'hidden'}}>
+            {/* Header */}
+            <Header
+                style={{
+                    backgroundColor: '#fff',
+                    padding: '0 16px',
+                    borderBottom: '1px solid #f0f0f0'
+                }}
+            >
+                <HeaderContent onProjectSelect={setSelectedProject}/>
+            </Header>
+
+            {/* Body: Sider + Content */}
+            {selectedProject.length > 0 ? <Layout>
+                    <Sider
+                        collapsible
+                        width={200}
+                        style={{}}
+                    >
+                        <SiderContent projectName={selectedProject}/>
+                    </Sider>
+
+                    <Content style={{padding: '10px'}}>
+                        <IssueBoardIndexPage/>
+                    </Content>
+                </Layout>
+                : undefined}
+        </Layout>
+    );
+};
+
+export default IssueTrackerLayout;
+
