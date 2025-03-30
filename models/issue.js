@@ -35,7 +35,7 @@ const Issue = sequelize.define('Issue', {
         defaultValue: 'Medium'
     },
     worklog: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.INTEGER,
     }
 });
 
