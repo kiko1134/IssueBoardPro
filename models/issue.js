@@ -17,12 +17,12 @@ const Issue = sequelize.define('Issue', {
     },
     assignedTo: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: 'User', key: 'id' }
     },
     assignedBy: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: 'User', key: 'id' }
     },
     dueDate: {
