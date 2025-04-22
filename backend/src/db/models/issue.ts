@@ -22,6 +22,8 @@ export class Issue
     extends Model<IssueAttributes, IssueCreationAttributes>
     implements IssueAttributes
 {
+    // ! - (the definite assignment assertion) tells TypeScript:
+    // “I know this field isn’t assigned in the constructor, but trust me—Sequelize will set it at runtime.”
     public id!: number;
     public title!: string;
     public description?: string;
