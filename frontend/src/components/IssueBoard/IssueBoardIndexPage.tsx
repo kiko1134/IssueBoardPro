@@ -1,10 +1,12 @@
 import {Button, Col, Input, Row, Select} from "antd";
 import React, {useState} from "react";
-
+import TicketModal, { Issue } from "../Ticket/TicketModal";
 
 const {Option} = Select;
 
 const IssueBoardIndexPage: React.FC = () => {
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [selectedTicket, setSelectedTicket] = useState<any>(null);
 
     const [selectedType, setSelectedType] = useState<string>();
     const [selectedPriority, setSelectedPriority] = useState<string>();
@@ -12,6 +14,27 @@ const IssueBoardIndexPage: React.FC = () => {
     const clearFilters = () => {
         setSelectedType(undefined);
         setSelectedPriority(undefined);
+    };
+
+    const openModal = () => {
+        setSelectedTicket({
+            id: 1,
+            title: "Sample Ticket",
+            description: "This is a sample ticket",
+            type: "bug",
+            priority: "high"
+        });
+        setIsModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setIsModalVisible(false);
+        setSelectedTicket(null);
+    };
+
+    const saveModal = (updatedIssue: Issue) => {
+        console.log("Updated issue:", updatedIssue);
+        closeModal();
     };
 
     return (
@@ -64,8 +87,10 @@ const IssueBoardIndexPage: React.FC = () => {
                             style={{
                                 backgroundColor: '#fff',
                                 minHeight: '200px',
-                                padding: '16px'
+                                padding: '16px',
+                                cursor: 'pointer'
                             }}
+                            onClick={openModal}
                         >
                             Column 1
                         </div>
@@ -94,6 +119,13 @@ const IssueBoardIndexPage: React.FC = () => {
                     </Col>
                 </Row>
             </div>
+
+            <TicketModal
+                open={isModalVisible}
+                onClose={closeModal}
+                issue={selectedTicket}
+                onSave={saveModal}
+            />
         </>
     )
 };
