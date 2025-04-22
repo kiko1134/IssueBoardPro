@@ -1,3 +1,6 @@
+import IssueBoardFilterActions from "./IssueBoardFilterActions";
+import IssueBoardContentPage from "./IssueBoardContentPage";
+
 import {Button, Col, Input, Row, Select} from "antd";
 import React, {useState} from "react";
 import TicketModal, { Issue } from "../Ticket/TicketModal";
@@ -5,6 +8,7 @@ import TicketModal, { Issue } from "../Ticket/TicketModal";
 const {Option} = Select;
 
 const IssueBoardIndexPage: React.FC = () => {
+
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [selectedTicket, setSelectedTicket] = useState<any>(null);
 
@@ -26,7 +30,6 @@ const IssueBoardIndexPage: React.FC = () => {
         });
         setIsModalVisible(true);
     };
-
     const closeModal = () => {
         setIsModalVisible(false);
         setSelectedTicket(null);
@@ -90,7 +93,6 @@ const IssueBoardIndexPage: React.FC = () => {
                                 padding: '16px',
                                 cursor: 'pointer'
                             }}
-                            onClick={openModal}
                         >
                             Column 1
                         </div>
@@ -119,13 +121,6 @@ const IssueBoardIndexPage: React.FC = () => {
                     </Col>
                 </Row>
             </div>
-
-            <TicketModal
-                open={isModalVisible}
-                onClose={closeModal}
-                issue={selectedTicket}
-                onSave={saveModal}
-            />
         </>
     )
 };
