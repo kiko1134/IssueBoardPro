@@ -1,0 +1,37 @@
+import process from 'process';
+import configJson from '../config/config.json';
+import {User} from "./user";
+import {Issue} from "./issue";
+import {Note} from "./note";
+import {Status} from "./status";
+import {Project} from "./project";
+import {Sequelize} from "sequelize";
+
+const env = process.env.NODE_ENV || 'development';
+const config = (configJson as any)[env];
+
+const sequelize = config.use_env_variable
+    ? new Sequelize(process.env[config.use_env_variable]!, config)
+    : new Sequelize(config.database, config.username, config.password, config);
+
+User.initialize(sequelize);
+Issue.initialize(sequelize);
+Note.initialize(sequelize);
+Status.initialize(sequelize);
+Project.initialize(sequelize);
+
+const db: any = {
+    sequelize,
+    Sequelize,
+    User,
+    Issue,
+    Note,
+    Status,
+    Project
+};
+
+Object.values(db)
+    .filter((m: any) => typeof m.associate === 'function')
+    .forEach((m: any) => m.associate(db));
+
+export default db;
