@@ -37,8 +37,13 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# ignore per-developer Sequelize CLI configs
+/backend/src/db/config/config.json
+
 # Optional: If you use npm cache directories or lock files that you don't want to track
 .npm/
 
 # Optional: Ignore any temporary files created by your text editor
 *~
+
+
