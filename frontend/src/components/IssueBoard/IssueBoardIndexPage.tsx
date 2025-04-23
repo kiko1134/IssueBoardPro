@@ -14,4 +14,3 @@ const IssueBoardIndexPage: React.FC = () => {
 };
 
 export default IssueBoardIndexPage;
-
