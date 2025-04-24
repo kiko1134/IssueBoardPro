@@ -19,14 +19,15 @@ const IssueModalComponent: React.FC = () => {
 
     const openModal = () => {
         setSelectedTicket({
-            id: 1,
-            title: "Sample Ticket",
-            description: "This is a sample ticket",
-            type: "bug",
-            priority: "high"
+            id: Date.now(),
+            title: "",
+            description: "",
+            type: "",
+            priority: ""
         });
         setIsModalVisible(true);
     };
+    
     const closeModal = () => {
         setIsModalVisible(false);
         setSelectedTicket(null);

@@ -8,8 +8,8 @@ export interface Issue {
   id: number;
   title: string;
   description: string;
-  type: string;
-  priority: string;
+  // type: string;
+  // priority: string;
 }
 
 interface Props {
@@ -99,4 +99,4 @@ const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
   );
 };
 
-export default TicketModal;
+export default TicketModal;  

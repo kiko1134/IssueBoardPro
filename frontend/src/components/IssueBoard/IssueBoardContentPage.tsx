@@ -4,6 +4,7 @@ import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-k
 import {Button, Card, Input} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 
+
 export interface Column {
     id: string;
     title: string;

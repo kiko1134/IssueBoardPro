@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {useDroppable} from "@dnd-kit/core";
 import IssueComponent from "../Issue/IssueComponent";
 import {Button, Card, Input} from "antd";
 import {Column, Task} from "../IssueBoardContentPage";
+import TicketModal, { Issue } from "../../Ticket/TicketModal";
+
 
 interface ColumnContainerProps {
     column: Column;
@@ -48,6 +50,12 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
         overflowY:"auto"
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const onModalClose = () => {
+        setIsModalOpen(false);
+    }
+
     // Also register this column as a droppable area for tasks.
     const {setNodeRef: setDroppableRef} = useDroppable({id: column.id});
     // Merge the refs.
@@ -74,25 +82,26 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
 
             {/* "Add Task" section */}
             {addingTaskColumn === column.id ? (
-                <Card style={{padding: 8, marginTop: 8}}>
-                    <Input
-                        placeholder="Task name"
-                        value={newTaskName}
-                        onChange={(e) => setNewTaskName(e.target.value)}
-                    />
-                    <Input
-                        placeholder="Description"
-                        value={newTaskDesc}
-                        onChange={(e) => setNewTaskDesc(e.target.value)}
-                        style={{marginTop: 4}}
-                    />
-                    <div style={{marginTop: 8, display: 'flex', gap: 8}}>
-                        <Button type="primary" onClick={() => onAddTask(column.id, newTaskName, newTaskDesc)}>
-                            Add Task
-                        </Button>
-                        <Button onClick={() => setAddingTaskColumn(null)}>Cancel</Button>
-                    </div>
-                </Card>
+                // <Card style={{padding: 8, marginTop: 8}}>
+                //     <Input
+                //         placeholder="Task name"
+                //         value={newTaskName}
+                //         onChange={(e) => setNewTaskName(e.target.value)}
+                //     />
+                //     <Input
+                //         placeholder="Description"
+                //         value={newTaskDesc}
+                //         onChange={(e) => setNewTaskDesc(e.target.value)}
+                //         style={{marginTop: 4}}
+                //     />
+                //     <div style={{marginTop: 8, display: 'flex', gap: 8}}>
+                //         <Button type="primary" onClick={() => onAddTask(column.id, newTaskName, newTaskDesc)}>
+                //             Add Task
+                //         </Button>
+                //         <Button onClick={() => setAddingTaskColumn(null)}>Cancel</Button>
+                //     </div>
+                // </Card>
+                <TicketModal open={isModalOpen} onClose={onModalClose}>
             ) : (
                 <Button
                     type="dashed"
