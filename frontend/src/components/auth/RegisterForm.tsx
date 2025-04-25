@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, message, Typography } from 'antd';
-import { register } from '../../api/auth';
+import { Button, Form, Input, Typography } from 'antd';
 const { Title } = Typography;
 
 interface RegisterFormProps {
