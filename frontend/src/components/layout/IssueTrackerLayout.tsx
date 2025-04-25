@@ -3,6 +3,7 @@ import {Layout} from 'antd';
 import HeaderContent from "../layout/HeaderContent";
 import SiderContent from "../layout/SiderContent";
 import IssueBoardIndexPage from "../IssueBoard/IssueBoardIndexPage";
+import {FundProjectionScreenOutlined} from "@ant-design/icons";
 
 const {Header, Sider, Content} = Layout;
 
@@ -10,6 +11,7 @@ const IssueTrackerLayout: React.FC = () => {
 
     //For the moment at the start of the app the state is empty string and only header is displayed. When project selected from header it load the sider and content.
     const [selectedProject, setSelectedProject] = useState<string>("");
+    const [collapsed, setCollapsed] = useState(false);
 
 
     return (
@@ -29,10 +31,14 @@ const IssueTrackerLayout: React.FC = () => {
             {selectedProject.length > 0 ? <Layout>
                     <Sider
                         collapsible
+                        collapsed={collapsed}
+                        onCollapse={(c) => setCollapsed(c)}
                         width={200}
-                        style={{}}
                     >
-                        <SiderContent projectName={selectedProject}/>
+                        <SiderContent
+                            projectName={selectedProject}
+                            icon={<FundProjectionScreenOutlined />}
+                            collapsed={collapsed}/>
                     </Sider>
 
                     <Content style={{padding: '10px'}}>

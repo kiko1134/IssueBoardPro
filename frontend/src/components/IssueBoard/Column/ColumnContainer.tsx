@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {useDroppable} from "@dnd-kit/core";
@@ -6,10 +6,12 @@ import IssueComponent from "../Issue/IssueComponent";
 import {Button, Card, Input} from "antd";
 import {Column, Task} from "../IssueBoardContentPage";
 
+
 interface ColumnContainerProps {
     column: Column;
     tasks: Task[];
     onAddTask: (columnId: string, name: string, description: string) => void;
+    onTaskClick: (task: Task) => void;
     addingTaskColumn: string | null;
     setAddingTaskColumn: (columnId: string | null) => void;
     newTaskName: string;
@@ -28,6 +30,7 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
                                                              setNewTaskName,
                                                              newTaskDesc,
                                                              setNewTaskDesc,
+                                                             onTaskClick
                                                          }) => {
     // Make the column draggable (but we'll only attach the drag listeners to the header)
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
@@ -45,7 +48,7 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
         padding: 8,
         display: 'flex',
         flexDirection: 'column',
-        overflowY:"auto"
+        overflowY: "auto"
     };
 
     // Also register this column as a droppable area for tasks.
@@ -67,7 +70,7 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
             <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
                 <div style={{minHeight: 50}}>
                     {tasks.map((issue) => (
-                        <IssueComponent key={issue.id} issue={issue}/>
+                        <IssueComponent key={issue.id} issue={issue} onClick={() => onTaskClick(issue)}/>
                     ))}
                 </div>
             </SortableContext>

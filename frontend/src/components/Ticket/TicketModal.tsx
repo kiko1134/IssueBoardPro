@@ -1,28 +1,40 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Modal, Form, Input, Select, Button } from "antd";
+import {Task} from "../IssueBoard/IssueBoardContentPage";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-export interface Issue {
-  id: number;
-  title: string;
-  description: string;
-  type: string;
-  priority: string;
-}
+// export interface Issue {
+//   id: number;
+//   title: string;
+//   description: string;
+//   // type: string;
+//   // priority: string;
+// }
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  issue: Issue | null;
-  onSave: (updatedIssue: Issue) => void;
+  issue: Task | null;
+  onSave: (updatedIssue: Task) => void;
 }
 
 const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
   const [form] = Form.useForm();
 
-  if (!issue) return null;
+  const currentIssue = issue;
+
+  //initialize the form whenever a new issue is selected
+  useEffect(() => {
+    if(!currentIssue) return;
+    form.setFieldsValue({
+      name: currentIssue.name,
+      description: currentIssue.description,
+    });
+  }, [currentIssue, form]);
+
+  if (!currentIssue) return null;
 
   const handleOk = () => {
     form
@@ -38,7 +50,7 @@ const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
 
   return (
     <Modal
-      title={`Issue #${issue.id}`}
+      title={`Issue #${currentIssue.id}`}
       open={open}
       onCancel={onClose}
       footer={[
@@ -53,11 +65,11 @@ const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
       <Form
         form={form}
         layout="vertical"
-        initialValues={issue}
+        initialValues={currentIssue}
       >
         <Form.Item
           label="Title"
-          name="title"
+          name="name"
           rules={[{ required: true, message: "Title is required" }]}
         >
           <Input />
@@ -99,4 +111,4 @@ const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
   );
 };
 
-export default TicketModal;
+export default TicketModal;  

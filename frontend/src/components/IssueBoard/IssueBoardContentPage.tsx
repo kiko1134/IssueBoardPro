@@ -3,6 +3,8 @@ import {closestCenter, DndContext, DragEndEvent,} from '@dnd-kit/core';
 import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-kit/sortable';
 import {Button, Card, Input} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
+import TicketModal from "../Ticket/TicketModal";
+
 
 export interface Column {
     id: string;
@@ -47,6 +49,8 @@ const IssueBoardContentPage: React.FC = () => {
     const [addingTaskColumn, setAddingTaskColumn] = useState<string | null>(null);
     const [newTaskName, setNewTaskName] = useState('');
     const [newTaskDesc, setNewTaskDesc] = useState('');
+
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     // Unified drag end handler to update either columns or tasks.
     const handleDragEnd = (event: DragEndEvent) => {
@@ -110,58 +114,84 @@ const IssueBoardContentPage: React.FC = () => {
         setAddingColumn(false);
     };
 
+    const handleTaskClick = (task: Task) => {
+        setSelectedTask(task);
+    };
+
+    const closeModal = () => {
+        setSelectedTask(null);
+    }
+
+    //Have in mind that this solution is temporary. Will be reaplced with data from the backend
+    const handleSave = (updatedTask: Task) => {
+        setTasks((prev) =>
+            prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+        );
+        closeModal();
+    };
+
+
     return (
-        <div style={{height: 'calc(100% - 50px)', overflowX: 'auto', display: 'flex'}}>
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                {/* Wrap columns in a SortableContext (for horizontal column reordering) */}
-                <SortableContext items={columns.map((col) => col.id)} strategy={horizontalListSortingStrategy}>
-                    <div style={{display: 'flex'}}>
-                        {columns.map((column) => {
-                            const tasksInColumn = tasks.filter((task) => task.columnId === column.id);
-                            return (
-                                <ColumnContainer
-                                    key={column.id}
-                                    column={column}
-                                    tasks={tasksInColumn}
-                                    onAddTask={handleAddTask}
-                                    addingTaskColumn={addingTaskColumn}
-                                    setAddingTaskColumn={setAddingTaskColumn}
-                                    newTaskName={newTaskName}
-                                    setNewTaskName={setNewTaskName}
-                                    newTaskDesc={newTaskDesc}
-                                    setNewTaskDesc={setNewTaskDesc}
-                                />
-                            );
-                        })}
-                        <div style={{margin: 8}}>
-                            {addingColumn ? (
-                                <Card style={{width: 300, padding: 8}}>
-                                    <Input
-                                        placeholder="Enter column name..."
-                                        value={newColumnTitle}
-                                        onChange={(e) => setNewColumnTitle(e.target.value)}
+        <>
+            <div style={{height: 'calc(100% - 50px)', overflowX: 'auto', display: 'flex'}}>
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    {/* Wrap columns in a SortableContext (for horizontal column reordering) */}
+                    <SortableContext items={columns.map((col) => col.id)} strategy={horizontalListSortingStrategy}>
+                        <div style={{display: 'flex'}}>
+                            {columns.map((column) => {
+                                const tasksInColumn = tasks.filter((task) => task.columnId === column.id);
+                                return (
+                                    <ColumnContainer
+                                        key={column.id}
+                                        column={column}
+                                        tasks={tasksInColumn}
+                                        onAddTask={handleAddTask}
+                                        onTaskClick={handleTaskClick}
+                                        addingTaskColumn={addingTaskColumn}
+                                        setAddingTaskColumn={setAddingTaskColumn}
+                                        newTaskName={newTaskName}
+                                        setNewTaskName={setNewTaskName}
+                                        newTaskDesc={newTaskDesc}
+                                        setNewTaskDesc={setNewTaskDesc}
                                     />
-                                    <div style={{marginTop: 8, display: 'flex', gap: 8}}>
-                                        <Button type="primary" onClick={handleAddColumn}>
-                                            Add Column
-                                        </Button>
-                                        <Button onClick={() => setAddingColumn(false)}>Cancel</Button>
-                                    </div>
-                                </Card>
-                            ) : (
-                                <Button
-                                    type="dashed"
-                                    style={{width: 300, height: '100%'}}
-                                    onClick={() => setAddingColumn(true)}
-                                >
-                                    + Add another column
-                                </Button>
-                            )}
+                                );
+                            })}
+                            <div style={{margin: 8}}>
+                                {addingColumn ? (
+                                    <Card style={{width: 300, padding: 8}}>
+                                        <Input
+                                            placeholder="Enter column name..."
+                                            value={newColumnTitle}
+                                            onChange={(e) => setNewColumnTitle(e.target.value)}
+                                        />
+                                        <div style={{marginTop: 8, display: 'flex', gap: 8}}>
+                                            <Button type="primary" onClick={handleAddColumn}>
+                                                Add Column
+                                            </Button>
+                                            <Button onClick={() => setAddingColumn(false)}>Cancel</Button>
+                                        </div>
+                                    </Card>
+                                ) : (
+                                    <Button
+                                        type="dashed"
+                                        style={{width: 300, height: '100%'}}
+                                        onClick={() => setAddingColumn(true)}
+                                    >
+                                        + Add another column
+                                    </Button>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </SortableContext>
-            </DndContext>
-        </div>
+                    </SortableContext>
+                </DndContext>
+            </div>
+            <TicketModal
+                open={!!selectedTask}
+                issue={selectedTask}
+                onClose={closeModal}
+                onSave={handleSave}
+            />
+        </>
     );
 };
 

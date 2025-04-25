@@ -3,7 +3,7 @@ import {DownOutlined, PlusOutlined} from "@ant-design/icons";
 import React from "react";
 
 const menuItems = [
-    {label: "Project 1", key: "1"},
+    {label: "First Project Firm LOng LOng title", key: "1"},
     {label: "Project 2", key: "2"},
     {label: "Project 3", key: "3"},
 ];

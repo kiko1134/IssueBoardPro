@@ -1,6 +1,8 @@
 import React from "react";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
+import {Card} from "antd";
+import {MenuOutlined} from "@ant-design/icons"
 
 interface Issue {
     id: string;
@@ -11,9 +13,11 @@ interface Issue {
 
 interface IssueComponentProps {
     issue: Issue;
+    onClick: () => void;
+
 }
 
-const IssueComponent: React.FC<IssueComponentProps> = ({ issue }) => {
+const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
     // Pass containerId as part of the data so we know which column this task is in.
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
         id: issue.id,
@@ -22,17 +26,34 @@ const IssueComponent: React.FC<IssueComponentProps> = ({ issue }) => {
     const style: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,
-        padding: '8px',
+        padding: '4px',
         margin: '4px 0',
-        backgroundColor: '#e6f7ff',
-        border: '1px solid #91d5ff',
         borderRadius: '4px',
         cursor: 'grab',
     };
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <strong>{issue.name}</strong>
-            <p style={{margin: 0, fontSize: '12px'}}>{issue.description}</p>
+        <div ref={setNodeRef} style={style}>
+            <Card
+                size="small"
+                hoverable
+                onClick={onClick}
+                style={{padding: 6, cursor: "pointer", backgroundColor: '#e6f7ff'}}
+                title={<strong>{issue.name}</strong>}
+                extra={
+                    <span
+                        {...attributes}
+                        {...listeners}
+                        style={{cursor: "grab", padding: "4px"}}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+            <MenuOutlined/>
+          </span>
+                }
+            >
+                <div style={{fontSize: 12, color: "#666", marginTop: 4}}>
+                    {issue.description}
+                </div>
+            </Card>
         </div>
     );
 };
