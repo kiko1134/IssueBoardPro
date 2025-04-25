@@ -3,16 +3,33 @@ import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import IssueTrackerLayout from './components/layout/IssueTrackerLayout';
 import {BrowserRouter, Navigate, Route, Routes, useNavigate} from "react-router-dom";
+import {message} from "antd";
 
 // a little wrapper so we can use `useNavigate` inside our element prop
-const RegisterPage: React.FC<{ onRegisterSuccess: () => void }> = ({ onRegisterSuccess }) => {
+const RegisterPage: React.FC<{ onRegisterSuccess?: () => void }> = ({onRegisterSuccess}) => {
+    // const navigate = useNavigate();
+    // return (
+    //     <RegisterForm
+    //         onRegisterSuccess={() => {
+    //             // onRegisterSuccess();
+    //             navigate('/login');
+    //         }}
+    //     />
+    // );
+
     const navigate = useNavigate();
+
+    const onSuccess = () => {
+        message.success('Registration successful! Please log in.');
+        // onRegisterSuccess();
+        navigate('/login',{ replace: true });
+    };
+    const switchToLogin = () => navigate('/login');
+
     return (
         <RegisterForm
-            onRegisterSuccess={() => {
-                onRegisterSuccess();    // you could show a “please log in” toast here
-                navigate('/login');     // send them to the login page
-            }}
+            onRegisterSuccess={onSuccess}
+            onSwitchToLogin={switchToLogin}
         />
     );
 };
@@ -40,6 +57,24 @@ const App: React.FC = () => {
         setIsLoggedIn(false);
     };
 
+    // Wrapper for login route
+    const LoginPage: React.FC = () => {
+        const navigate = useNavigate();
+        const onLoginSuccess = () => {
+            handleLoginSuccess();
+            navigate('/', {replace: true});
+        };
+        const onSwitchToRegister = () => {
+            navigate('/register');
+        };
+        return (
+            <LoginForm
+                onLoginSuccess={onLoginSuccess}
+                onSwitchToRegister={onSwitchToRegister}
+            />
+        );
+    };
+
     return (
         <BrowserRouter>
             <Routes>
@@ -48,32 +83,21 @@ const App: React.FC = () => {
                     path="/login"
                     element={
                         isLoggedIn ? (
-                            <Navigate to="/" replace />
+                            <Navigate to="/" replace/>
                         ) : (
-                            <LoginForm onLoginSuccess={handleLoginSuccess} />
+                            <LoginPage/>
                         )
                     }
                 />
 
                 {/* Register page */}
-                {/*<Route*/}
-                {/*    path="/register"*/}
-                {/*    element={*/}
-                {/*        isLoggedIn ? (*/}
-                {/*            <Navigate to="/" replace />*/}
-                {/*        ) : (*/}
-                {/*            <RegisterForm onRegisterSuccess={handleLoginSuccess} />*/}
-                {/*        )*/}
-                {/*    }*/}
-                {/*/>*/}
-
                 <Route
                     path="/register"
                     element={
                         isLoggedIn ? (
                             <Navigate to="/" replace/>
                         ) : (
-                            <RegisterPage onRegisterSuccess={() => {/* maybe show a toast */}}/>
+                            <RegisterPage/>
                         )
                     }
                 />
@@ -87,7 +111,7 @@ const App: React.FC = () => {
                                 // onLogout={handleLogout}
                             />
                         ) : (
-                            <Navigate to="/login" replace />
+                            <Navigate to="/login" replace/>
                         )
                     }
                 />
@@ -97,9 +121,9 @@ const App: React.FC = () => {
                     path="*"
                     element={
                         isLoggedIn ? (
-                            <Navigate to="/" replace />
+                            <Navigate to="/" replace/>
                         ) : (
-                            <Navigate to="/login" replace />
+                            <Navigate to="/login" replace/>
                         )
                     }
                 />
