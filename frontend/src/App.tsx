@@ -1,73 +1,106 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import IssueTrackerLayout from './components/layout/IssueTrackerLayout';
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes, useNavigate} from "react-router-dom";
+
+// a little wrapper so we can use `useNavigate` inside our element prop
+const RegisterPage: React.FC<{ onRegisterSuccess: () => void }> = ({ onRegisterSuccess }) => {
+    const navigate = useNavigate();
+    return (
+        <RegisterForm
+            onRegisterSuccess={() => {
+                onRegisterSuccess();    // you could show a “please log in” toast here
+                navigate('/login');     // send them to the login page
+            }}
+        />
+    );
+};
 
 const App: React.FC = () => {
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);
-    // const [showRegister, setShowRegister] = useState(false);
-    //
-    // if (isLoggedIn) {
-    //     return <IssueTrackerLayout />;
-    // }
-    //
-    // return showRegister ? (
-    //     <RegisterForm
-    //         onRegisterSuccess={() => {
-    //             setShowRegister(false); // След регистрация – връщаме към login
-    //         }}
-    //         onSwitchToLogin={() => setShowRegister(false)}
-    //     />
-    // ) : (
-    //     <LoginForm
-    //         onLoginSuccess={() => setIsLoggedIn(true)}
-    //         onSwitchToRegister={() => setShowRegister(true)}
-    //     />
-    // );
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() =>
+        Boolean(localStorage.getItem('token'))
+    );
+
+    // In case another tab logs you out/in
+    useEffect(() => {
+        const onStorage = () => {
+            setIsLoggedIn(Boolean(localStorage.getItem('token')));
+        };
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
+    }, []);
+
+    const handleLoginSuccess = () => {
+        setIsLoggedIn(true);
+    };
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+    };
 
     return (
         <BrowserRouter>
             <Routes>
-                {/* if already logged in, redirect away from /login */}
+                {/* Login page */}
                 <Route
                     path="/login"
                     element={
-                        isLoggedIn
-                            ? <Navigate to="/" replace/>
-                            : <LoginForm onLoginSuccess={() => setIsLoggedIn(true)}/>
+                        isLoggedIn ? (
+                            <Navigate to="/" replace />
+                        ) : (
+                            <LoginForm onLoginSuccess={handleLoginSuccess} />
+                        )
                     }
                 />
 
-                {/* same guard for /register */}
+                {/* Register page */}
+                {/*<Route*/}
+                {/*    path="/register"*/}
+                {/*    element={*/}
+                {/*        isLoggedIn ? (*/}
+                {/*            <Navigate to="/" replace />*/}
+                {/*        ) : (*/}
+                {/*            <RegisterForm onRegisterSuccess={handleLoginSuccess} />*/}
+                {/*        )*/}
+                {/*    }*/}
+                {/*/>*/}
+
                 <Route
                     path="/register"
                     element={
-                        isLoggedIn
-                            ? <Navigate to="/" replace/>
-                            : <RegisterForm onRegisterSuccess={() => setIsLoggedIn(true)}/>
+                        isLoggedIn ? (
+                            <Navigate to="/" replace/>
+                        ) : (
+                            <RegisterPage onRegisterSuccess={() => {/* maybe show a toast */}}/>
+                        )
                     }
                 />
 
-                {/* protected root route */}
+                {/* Protected root */}
                 <Route
                     path="/"
                     element={
-                        isLoggedIn
-                            ? <IssueTrackerLayout/>
-                            : <Navigate to="/login" replace/>
+                        isLoggedIn ? (
+                            <IssueTrackerLayout
+                                // onLogout={handleLogout}
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
                     }
                 />
 
-                {/* catch-all: send unknown URLs to root or login */}
+                {/* Fallback for any other route */}
                 <Route
                     path="*"
                     element={
-                        isLoggedIn
-                            ? <Navigate to="/" replace/>
-                            : <Navigate to="/login" replace/>
+                        isLoggedIn ? (
+                            <Navigate to="/" replace />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
                     }
                 />
             </Routes>

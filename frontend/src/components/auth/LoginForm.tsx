@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Typography } from 'antd';
+import {Button, Form, Input, message, Typography} from 'antd';
+import {login} from "../../api/userService";
 
 const { Title } = Typography;
 
@@ -11,32 +12,20 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onSwitchToRegister }) => {
     const [loading, setLoading] = useState(false);
 
+    const onFinish = async (values: {email:string, password:string} ) => {
 
-    // const onFinish = async (values: any) => {
-    //     setLoading(true);
-    //     try {
-    //         const data = await login(values.email, values.password);
-    //         localStorage.setItem('token', data.token);
-    //         message.success('Login successful!');
-    //         onLoginSuccess();
-    //     } catch (error: any) {
-    //         message.error(error?.response?.data?.message || 'Login failed');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    const onFinish = (values: any) => {
         setLoading(true);
-
-        // Тук можеш да добавиш реална логика за login (напр. API call)
-        console.log('Login with:', values);
-
-        setTimeout(() => {
+        try{
+            const {token,username} = await login(values);
+            localStorage.setItem('token', token);
+            message.success('Welcome back, ' + username);
+            onLoginSuccess();
+        } catch (error: any) {
+            message.error(error?.response?.data?.message || 'Login failed');
+        } finally {
             setLoading(false);
-            onLoginSuccess(); // казваме на App.tsx, че сме "влезли"
-        }, 1000);
-    };
+        }
+    }
 
     return (
         <div style={{ maxWidth: 300, margin: '100px auto' }}>
