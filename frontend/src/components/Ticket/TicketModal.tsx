@@ -1,114 +1,118 @@
 import React, {useEffect} from "react";
-import { Modal, Form, Input, Select, Button } from "antd";
-import {Task} from "../IssueBoard/IssueBoardContentPage";
+import {Button, Form, Input, Modal, Select} from "antd";
+import {Task as TaskModel} from '../../api/taskService';
 
-const { TextArea } = Input;
-const { Option } = Select;
 
-// export interface Issue {
-//   id: number;
-//   title: string;
-//   description: string;
-//   // type: string;
-//   // priority: string;
-// }
+const {TextArea} = Input;
+const {Option} = Select;
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  issue: Task | null;
-  onSave: (updatedIssue: Task) => void;
+    open: boolean;
+    onClose: () => void;
+    issue: TaskModel | null;
+    onSave: (updatedIssue: TaskModel) => void;
 }
 
-const TicketModal: React.FC<Props> = ({ open, onClose, issue, onSave }) => {
-  const [form] = Form.useForm();
+const TicketModal: React.FC<Props> = ({open, onClose, issue, onSave}) => {
+    const [form] = Form.useForm<TaskModel>();
 
-  const currentIssue = issue;
+    // const currentIssue = issue;
 
-  //initialize the form whenever a new issue is selected
-  useEffect(() => {
-    if(!currentIssue) return;
-    form.setFieldsValue({
-      name: currentIssue.name,
-      description: currentIssue.description,
-    });
-  }, [currentIssue, form]);
+    // Populate form fields when an issue is selected
+    useEffect(() => {
+        if (issue) {
+            form.setFieldsValue({
+                title: issue.title,
+                description: issue.description,
+                type: issue.type,
+                priority: issue.priority,
+            });
+        }
+    }, [issue, form]);
 
-  if (!currentIssue) return null;
+    if (!issue) return null;
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onSave({ ...issue, ...values });
-        onClose();
-      })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
-      });
-  };
+    const handleOk = () => {
+        form
+            .validateFields()
+            .then((values) => {
 
-  return (
-    <Modal
-      title={`Issue #${currentIssue.id}`}
-      open={open}
-      onCancel={onClose}
-      footer={[
-        <Button key="cancel" onClick={onClose}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleOk}>
-          Save
-        </Button>,
-      ]}
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={currentIssue}
-      >
-        <Form.Item
-          label="Title"
-          name="name"
-          rules={[{ required: true, message: "Title is required" }]}
+                const updated: TaskModel = {
+                    ...issue,
+                    title: values.title,
+                    description: values.description,
+                    type: values.type,
+                    priority: values.priority,
+                };
+                onSave(updated);
+                onClose();
+            })
+            .catch((info) => {
+                console.log("Validate Failed:", info);
+            });
+    };
+
+    return (
+        <Modal
+            title={`Issue #${issue.id}`}
+            open={open}
+            onCancel={onClose}
+            footer={[
+                <Button key="cancel" onClick={onClose}>
+                    Cancel
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleOk}>
+                    Save
+                </Button>,
+            ]}
         >
-          <Input />
-        </Form.Item>
+            <Form
+                form={form}
+                layout="vertical"
+                initialValues={issue}
+            >
+                <Form.Item
+                    label="Title"
+                    name="name"
+                    rules={[{required: true, message: "Title is required"}]}
+                >
+                    <Input/>
+                </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: "Description is required" }]}
-        >
-          <TextArea rows={4} />
-        </Form.Item>
+                <Form.Item
+                    label="Description"
+                    name="description"
+                    rules={[{required: true, message: "Description is required"}]}
+                >
+                    <TextArea rows={4}/>
+                </Form.Item>
 
-        <Form.Item
-          label="Type"
-          name="type"
-          rules={[{ required: true, message: "Type is required" }]}
-        >
-          <Select placeholder="Select issue type">
-            <Option value="bug">Bug</Option>
-            <Option value="feature">Feature</Option>
-            <Option value="task">Task</Option>
-          </Select>
-        </Form.Item>
+                <Form.Item
+                    label="Type"
+                    name="type"
+                    rules={[{required: true, message: "Type is required"}]}
+                >
+                    <Select placeholder="Select issue type">
+                        <Option value="Bug">Bug</Option>
+                        <Option value="Feature">Feature</Option>
+                        <Option value="Task">Task</Option>
+                    </Select>
+                </Form.Item>
 
-        <Form.Item
-          label="Priority"
-          name="priority"
-          rules={[{ required: true, message: "Priority is required" }]}
-        >
-          <Select placeholder="Select priority">
-            <Option value="low">Low</Option>
-            <Option value="medium">Medium</Option>
-            <Option value="high">High</Option>
-          </Select>
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
+                <Form.Item
+                    label="Priority"
+                    name="priority"
+                    rules={[{required: true, message: "Priority is required"}]}
+                >
+                    <Select placeholder="Select priority">
+                        <Option value="Low">Low</Option>
+                        <Option value="Medium">Medium</Option>
+                        <Option value="High">High</Option>
+                    </Select>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
 };
 
 export default TicketModal;  

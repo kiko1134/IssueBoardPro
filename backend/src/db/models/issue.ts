@@ -1,4 +1,5 @@
-import { Model, DataTypes, Sequelize, Optional } from 'sequelize';
+import {DataTypes, Model, Optional, Sequelize} from 'sequelize';
+
 // Attributes interface for Issue
 interface IssueAttributes {
     id: number;
@@ -6,6 +7,7 @@ interface IssueAttributes {
     description?: string;
     statusId: number;
     projectId: number;
+    columnId?: number;
     assignedTo?: number;
     assignedBy?: number;
     dueDate?: Date;
@@ -16,12 +18,12 @@ interface IssueAttributes {
     updatedAt?: Date;
 }
 
-interface IssueCreationAttributes extends Optional<IssueAttributes, 'id'> {}
+interface IssueCreationAttributes extends Optional<IssueAttributes, 'id' | 'columnId'> {
+}
 
 export class Issue
     extends Model<IssueAttributes, IssueCreationAttributes>
-    implements IssueAttributes
-{
+    implements IssueAttributes {
     // ! - (the definite assignment assertion) tells TypeScript:
     // “I know this field isn’t assigned in the constructor, but trust me—Sequelize will set it at runtime.”
     public id!: number;
@@ -60,22 +62,27 @@ export class Issue
                 statusId: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     allowNull: false,
-                    references: { model: 'Status', key: 'id' },
+                    references: {model: 'Status', key: 'id'},
                 },
                 projectId: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     allowNull: false,
-                    references: { model: 'Project', key: 'id' },
+                    references: {model: 'Project', key: 'id'},
+                },
+                columnId: {
+                    type: DataTypes.INTEGER.UNSIGNED,
+                    allowNull: true,
+                    defaultValue: 0,
                 },
                 assignedTo: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     allowNull: true,
-                    references: { model: 'User', key: 'id' },
+                    references: {model: 'User', key: 'id'},
                 },
                 assignedBy: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     allowNull: true,
-                    references: { model: 'User', key: 'id' },
+                    references: {model: 'User', key: 'id'},
                 },
                 dueDate: {
                     type: DataTypes.DATE,
@@ -103,10 +110,10 @@ export class Issue
     }
 
     static associate(models: any) {
-        Issue.belongsTo(models.Project, { foreignKey: 'projectId' });
-        Issue.belongsTo(models.Status,  { foreignKey: 'statusId' });
-        Issue.belongsTo(models.User,    { foreignKey: 'assignedTo',   as: 'Assignee' });
-        Issue.belongsTo(models.User,    { foreignKey: 'assignedBy',   as: 'Reporter' });
-        Issue.hasMany(models.Note,      { foreignKey: 'issueId' });
+        Issue.belongsTo(models.Project, {foreignKey: 'projectId'});
+        Issue.belongsTo(models.Status, {foreignKey: 'statusId'});
+        Issue.belongsTo(models.User, {foreignKey: 'assignedTo', as: 'Assignee'});
+        Issue.belongsTo(models.User, {foreignKey: 'assignedBy', as: 'Reporter'});
+        Issue.hasMany(models.Note, {foreignKey: 'issueId'});
     }
 }

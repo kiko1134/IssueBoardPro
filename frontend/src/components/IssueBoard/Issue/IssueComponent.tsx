@@ -3,16 +3,11 @@ import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {Card} from "antd";
 import {MenuOutlined} from "@ant-design/icons"
+import {Task} from "../../../api/taskService";
 
-interface Issue {
-    id: string;
-    name: string;
-    description: string;
-    columnId: string;
-}
 
 interface IssueComponentProps {
-    issue: Issue;
+    issue: Task;
     onClick: () => void;
 
 }
@@ -38,7 +33,7 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
                 hoverable
                 onClick={onClick}
                 style={{padding: 6, cursor: "pointer", backgroundColor: '#e6f7ff'}}
-                title={<strong>{issue.name}</strong>}
+                title={<strong>{issue.title}</strong>}
                 extra={
                     <span
                         {...attributes}

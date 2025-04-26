@@ -61,6 +61,11 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
+        columnId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
         createdAt: {
             allowNull: false,
             type: DataTypes.DATE,

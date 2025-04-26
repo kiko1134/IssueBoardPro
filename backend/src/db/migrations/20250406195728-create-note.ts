@@ -1,7 +1,7 @@
 import { QueryInterface, DataTypes, literal } from 'sequelize';
 
 export async function up(queryInterface: QueryInterface): Promise<void> {
-  await queryInterface.createTable('Users', {
+  await queryInterface.createTable('Notes', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -35,5 +35,5 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
 }
 
 export async function down(queryInterface: QueryInterface): Promise<void> {
-  await queryInterface.dropTable('Users');
+  await queryInterface.dropTable('Notes');
 }

@@ -2,24 +2,10 @@ import { Router} from 'express';
 import UserController from "../controllers/UserController";
 import ProjectController from "../controllers/ProjectController";
 import {authenticateJWT} from "../middleware/authMiddleware";
+import IssueController from "../controllers/IssueController";
+import ColumnController from "../controllers/ColumnController";
 
 const router = Router();
-
-// // GET /api/users
-// router.get('/', async (_req: Request, res: Response) => {
-//     const users = await db.User.findAll({
-//         attributes: ['id','username','email','createdAt']
-//     });
-//     res.json(users);
-// });
-//
-// // POST /api/users
-// router.post('/', async (req: Request, res: Response) => {
-//     const { username, email, password } = req.body;
-//     const hash = await bcrypt.hash(password, 10);
-//     const user = await db.User.create({ username, email, password: hash });
-//     res.status(201).json({ id: user.id, username, email });
-// });
 
 router.get('/users',       UserController.index);
 router.get('/users/:id',    UserController.show);
@@ -32,5 +18,17 @@ router.use(authenticateJWT);
 
 router.get('/projects', ProjectController.index);
 router.post('/projects', ProjectController.store);
+
+router.get('/issues',  IssueController.index);
+router.get('/issues/:id', IssueController.show);
+router.post('/issues', IssueController.store);
+router.put('/issues/:id', IssueController.update);
+router.delete('/issues/:id', IssueController.destroy);
+
+router.get('/columns', ColumnController.index);
+router.get('/columns/:id', ColumnController.show);
+router.post('/columns', ColumnController.store);
+router.put('/columns/:id', ColumnController.update);
+router.delete('/columns/:id', ColumnController.destroy);
 
 export default router;

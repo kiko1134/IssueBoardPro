@@ -9,10 +9,10 @@ const {Header, Sider, Content} = Layout;
 
 const IssueTrackerLayout: React.FC = () => {
 
+    const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+    const [selectedProjectName, setSelectedProjectName] = useState<string>('');
     //For the moment at the start of the app the state is empty string and only header is displayed. When project selected from header it load the sider and content.
-    const [selectedProject, setSelectedProject] = useState<string>("");
     const [collapsed, setCollapsed] = useState(false);
-
 
     return (
         <Layout style={{height: '100vh', overflow: 'hidden'}}>
@@ -24,11 +24,14 @@ const IssueTrackerLayout: React.FC = () => {
                     borderBottom: '1px solid #f0f0f0'
                 }}
             >
-                <HeaderContent onProjectSelect={setSelectedProject}/>
+                <HeaderContent onProjectSelect={(projectId, projectName) => {
+                    setSelectedProjectId(projectId);
+                    setSelectedProjectName(projectName);
+                }}/>
             </Header>
 
             {/* Body: Sider + Content */}
-            {selectedProject.length > 0 ? <Layout>
+            {selectedProjectId ? <Layout>
                     <Sider
                         collapsible
                         collapsed={collapsed}
@@ -36,13 +39,13 @@ const IssueTrackerLayout: React.FC = () => {
                         width={200}
                     >
                         <SiderContent
-                            projectName={selectedProject}
-                            icon={<FundProjectionScreenOutlined />}
+                            projectName={selectedProjectName}
+                            icon={<FundProjectionScreenOutlined/>}
                             collapsed={collapsed}/>
                     </Sider>
 
                     <Content style={{padding: '10px'}}>
-                        <IssueBoardIndexPage/>
+                        <IssueBoardIndexPage projectId={(Number(selectedProjectId))}/>
                     </Content>
                 </Layout>
                 : undefined}

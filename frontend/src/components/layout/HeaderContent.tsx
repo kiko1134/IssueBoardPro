@@ -3,56 +3,15 @@ import {DownOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {createProject, fetchProjects, Project} from "../../api/projectService";
 
-// const menuItems = [
-//     {label: "First Project Firm LOng LOng title", key: "1"},
-//     {label: "Project 2", key: "2"},
-//     {label: "Project 3", key: "3"},
-// ];
-
 interface HeaderContentProps {
-    onProjectSelect: (projectName: string) => void;
+    onProjectSelect: (projectId: string, projectName: string) => void;
 }
 
 
 const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect}) => {
 
-    // const handleMenuClick = (info: any) => {
-    //     const selected = menuItems.find(item => item.key === info.key);
-    //     if (selected) {
-    //         onProjectSelect(selected.label);
-    //     }
-    // };
-    //
-    // return (
-    //     <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
-    //         <div
-    //             style={{
-    //                 fontSize: '20px',
-    //                 fontWeight: 'bold',
-    //                 marginRight: '16px'
-    //             }}
-    //         >
-    //             Issue Tracker
-    //         </div>
-    //
-    //         <Dropdown menu={{items: menuItems, onClick: handleMenuClick}} trigger={["click"]}>
-    //             <Button type="text" style={{marginRight: "16px"}}>
-    //                 Projects <DownOutlined/>
-    //             </Button>
-    //         </Dropdown>
-    //
-    //         <Button
-    //             type="primary"
-    //             icon={<PlusOutlined/>}
-    //             style={{marginRight: '16px'}}
-    //         >
-    //             Create Project
-    //         </Button>
-    //         <Button style={{marginLeft: 'auto'}}>CV</Button>
-    //     </div>
-
     const [projects, setProjects] = useState<Project[]>([]);
-    const [selectedProject, setSelectedProject] = useState<string>('');
+    const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
 
@@ -70,16 +29,20 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect}) => {
     };
 
     const items: MenuProps['items'] = projects.map(p => ({
-        key: p.name,
+        key: p.id.toString(),
         label: p.name,
     }));
 
     const menuProps: MenuProps = {
         items,
-        selectedKeys: [selectedProject],
+        selectedKeys: [selectedProjectId],
         onClick: ({ key }) => {
-            setSelectedProject(key as string);
-            onProjectSelect(key as string);
+            const projectId = key as string;
+            const proj = projects.find(p => p.id.toString() === projectId);
+            if(proj){
+                setSelectedProjectId(projectId);
+                onProjectSelect(projectId, proj.name);
+            }
         }
     };
 
@@ -109,12 +72,15 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect}) => {
             message.success(`Project "${newProj.name}" created`);
             closeModal();
             await loadProjects();
-            setSelectedProject(newProj.name);
-            onProjectSelect(newProj.name);
+            const idStr = newProj.id.toString();
+            setSelectedProjectId(idStr);
+            onProjectSelect(idStr,newProj.name);
         } catch (error: any) {
             message.error(error?.response?.data?.message || 'Failed to create project');
         }
     };
+
+    const selectedLabel = projects.find(p => p.id.toString() === selectedProjectId)?.name;
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -124,7 +90,7 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect}) => {
 
             <Dropdown menu={menuProps} trigger={['click']}>
                 <Button type="text" style={{ marginRight: 16 }}>
-                    {selectedProject || 'Select Project'} <DownOutlined />
+                    {selectedLabel || 'Select Project'} <DownOutlined />
                 </Button>
             </Dropdown>
 

@@ -1,56 +1,49 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {closestCenter, DndContext, DragEndEvent,} from '@dnd-kit/core';
 import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-kit/sortable';
-import {Button, Card, Input} from 'antd';
+import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../Ticket/TicketModal";
+import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/columnService";
+import {createTask, fetchTasks, Task as TaskModel} from "../../api/taskService";
 
-
-export interface Column {
-    id: string;
-    title: string;
+interface IssueBoardContentPageProps {
+    projectId: number;
 }
 
-export interface Task {
-    id: string;
-    name: string;
-    description: string;
-    columnId: string;
-}
 
-const initialColumns: Column[] = [
-    {id: 'column-1', title: 'To Do'},
-    {id: 'column-2', title: 'In Progress'},
-    {id: 'column-3', title: 'Done'},
-];
-
-const initialTasks: Task[] = [
-    {id: 'task-1', name: 'Task One', description: 'Description One', columnId: 'column-1'},
-    {id: 'task-2', name: 'Task Two', description: 'Description Two', columnId: 'column-1'},
-    {id: 'task-3', name: 'Task Three', description: 'Description Three', columnId: 'column-2'},
-];
-
-
-const createUniqueId = (prefix: string) => {
-    return prefix + '-' + Math.random().toString(36).substring(2, 9);
-};
-
-
-const IssueBoardContentPage: React.FC = () => {
+const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({projectId}) => {
     // State for columns and tasks.
-    const [columns, setColumns] = useState<Column[]>(initialColumns);
-    const [tasks, setTasks] = useState<Task[]>(initialTasks);
+    const [columns, setColumns] = useState<ColumnModel[]>([]);
+    const [tasks, setTasks] = useState<TaskModel[]>([]);
 
     // State for adding a new column.
     const [addingColumn, setAddingColumn] = useState(false);
     const [newColumnTitle, setNewColumnTitle] = useState('');
 
     // State for adding a new task.
-    const [addingTaskColumn, setAddingTaskColumn] = useState<string | null>(null);
+    const [addingTaskColumn, setAddingTaskColumn] = useState<number | null>(null);
     const [newTaskName, setNewTaskName] = useState('');
     const [newTaskDesc, setNewTaskDesc] = useState('');
 
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
+
+    // Load columns & tasks on mount or project change
+    useEffect(() => {
+        (async () => {
+            try {
+                setColumns(await fetchColumns(projectId));
+            } catch {
+                message.error('Failed to load columns');
+            }
+            try {
+                setTasks(await fetchTasks(projectId));
+            } catch {
+                message.error('Failed to load tasks');
+            }
+        })();
+    }, [projectId]);
+
 
     // Unified drag end handler to update either columns or tasks.
     const handleDragEnd = (event: DragEndEvent) => {
@@ -69,15 +62,10 @@ const IssueBoardContentPage: React.FC = () => {
         } else if (activeType === 'task') {
             // For tasks, determine source and destination columns.
             const sourceColumn = active.data.current?.containerId;
-            let destinationColumn: string | undefined;
             // The over target can be a task or a column.
             const overType = over.data.current?.type;
-            if (overType === 'task') {
-                destinationColumn = over.data.current?.containerId;
-            } else {
-                // If over is a column droppable, its id is the destination column.
-                destinationColumn = over.id as string;
-            }
+            let destinationColumn = overType === 'task' ?
+                over.data.current?.containerId : Number(over.id);
             if (sourceColumn && destinationColumn && sourceColumn !== destinationColumn) {
                 setTasks((prev) =>
                     prev.map((task) =>
@@ -85,36 +73,44 @@ const IssueBoardContentPage: React.FC = () => {
                     )
                 );
             }
-            // (Optional: implement reordering tasks within the same column here.)
         }
     };
 
-    const handleAddTask = (columnId: string, name: string, description: string) => {
-        if (!name.trim()) return;
-        const newTask: Task = {
-            id: createUniqueId('task'),
-            name: name.trim(),
-            description: description.trim(),
-            columnId,
-        };
-        setTasks((prev) => [...prev, newTask]);
-        setNewTaskName('');
-        setNewTaskDesc('');
-        setAddingTaskColumn(null);
+    const handleAddTask = async (columnId: number) => {
+        if (!newTaskName.trim()) return;
+        try {
+            const task = await createTask({
+                title: newTaskName.trim(),
+                description: newTaskDesc.trim(),
+                projectId,
+                statusId: 1,
+                columnId,
+                priority: 'Medium',
+                type: 'Task',
+                workLog: 0,
+            });
+            setTasks(prev => [...prev, task]);
+            setNewTaskName('');
+            setNewTaskDesc('');
+            setAddingTaskColumn(null);
+        } catch {
+            message.error('Failed to create task');
+        }
     };
 
-    const handleAddColumn = () => {
+    const handleAddColumn = async () => {
         if (!newColumnTitle.trim()) return;
-        const newColumn: Column = {
-            id: createUniqueId('column'),
-            title: newColumnTitle.trim(),
-        };
-        setColumns((prev) => [...prev, newColumn]);
-        setNewColumnTitle('');
-        setAddingColumn(false);
+        try {
+            const col = await createColumn({name: newColumnTitle.trim(), projectId});
+            setColumns(prev => [...prev, col]);
+            setNewColumnTitle('');
+            setAddingColumn(false);
+        } catch {
+            message.error('Failed to create column');
+        }
     };
 
-    const handleTaskClick = (task: Task) => {
+    const handleTaskClick = (task: TaskModel) => {
         setSelectedTask(task);
     };
 
@@ -122,8 +118,8 @@ const IssueBoardContentPage: React.FC = () => {
         setSelectedTask(null);
     }
 
-    //Have in mind that this solution is temporary. Will be reaplced with data from the backend
-    const handleSave = (updatedTask: Task) => {
+
+    const handleSave = (updatedTask: TaskModel) => {
         setTasks((prev) =>
             prev.map((task) => (task.id === updatedTask.id ? updatedTask : task))
         );
@@ -139,13 +135,15 @@ const IssueBoardContentPage: React.FC = () => {
                     <SortableContext items={columns.map((col) => col.id)} strategy={horizontalListSortingStrategy}>
                         <div style={{display: 'flex'}}>
                             {columns.map((column) => {
-                                const tasksInColumn = tasks.filter((task) => task.columnId === column.id);
                                 return (
                                     <ColumnContainer
                                         key={column.id}
+                                        // column={column}
                                         column={column}
-                                        tasks={tasksInColumn}
-                                        onAddTask={handleAddTask}
+                                        // tasks={tasksInColumn}
+                                        tasks = {tasks.filter(t => t.columnId === column.id)}
+                                        // onAddTask={handleAddTask}
+                                        onAddTask={() => handleAddTask(column.id)}
                                         onTaskClick={handleTaskClick}
                                         addingTaskColumn={addingTaskColumn}
                                         setAddingTaskColumn={setAddingTaskColumn}

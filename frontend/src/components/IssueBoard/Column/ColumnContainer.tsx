@@ -1,19 +1,20 @@
-import React, {useState} from "react";
+import React from "react";
 import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {useDroppable} from "@dnd-kit/core";
 import IssueComponent from "../Issue/IssueComponent";
 import {Button, Card, Input} from "antd";
-import {Column, Task} from "../IssueBoardContentPage";
+import {Column} from "../../../api/columnService";
+import {Task} from "../../../api/taskService";
 
 
 interface ColumnContainerProps {
     column: Column;
     tasks: Task[];
-    onAddTask: (columnId: string, name: string, description: string) => void;
+    onAddTask: (columnId:number) => void;
     onTaskClick: (task: Task) => void;
-    addingTaskColumn: string | null;
-    setAddingTaskColumn: (columnId: string | null) => void;
+    addingTaskColumn: number | null;
+    setAddingTaskColumn: (columnId: number | null) => void;
     newTaskName: string;
     setNewTaskName: (value: string) => void;
     newTaskDesc: string;
@@ -63,7 +64,7 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
         <div ref={setCombinedRef} style={columnStyle}>
             {/* DRAG HANDLE: Only the header gets the drag listeners */}
             <div {...attributes} {...listeners} style={{cursor: 'grab'}}>
-                <h3 style={{textAlign: 'center', margin: 0}}>{column.title}</h3>
+                <h3 style={{textAlign: 'center', margin: 0}}>{column.name}</h3>
             </div>
 
             {/* Tasks in this column */}
@@ -90,7 +91,7 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
                         style={{marginTop: 4}}
                     />
                     <div style={{marginTop: 8, display: 'flex', gap: 8}}>
-                        <Button type="primary" onClick={() => onAddTask(column.id, newTaskName, newTaskDesc)}>
+                        <Button type="primary" onClick={() => onAddTask(column.id)}>
                             Add Task
                         </Button>
                         <Button onClick={() => setAddingTaskColumn(null)}>Cancel</Button>
