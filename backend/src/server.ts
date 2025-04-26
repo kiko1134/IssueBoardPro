@@ -1,12 +1,20 @@
 import express, { Request, Response } from 'express';
+import  cors from 'cors';
 import dotenv from 'dotenv';
 
 import db from './db/models';
-import userRouter from './routes/user';
+import userRouter from './routes/router';
 
 dotenv.config();
 
 const app = express();
+
+// Allow React frontend to access this API
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}));
+
 app.use(express.json());
 
 // Test the database connection
@@ -18,7 +26,7 @@ db.sequelize
         process.exit(1);
     });
 
-app.use('/api/users', userRouter);
+app.use('/api', userRouter);
 
 //endpoint
 app.get('/', (_req: Request, res: Response) => {

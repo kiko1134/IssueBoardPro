@@ -1,33 +1,48 @@
-import { Request, Response } from 'express';
+import {RequestHandler} from 'express';
 import db from '../db/models';
 
-const { Project } = db;
+const { Project,User } = db;
 
 export default class ProjectController {
-  /** GET /api/projects — list all projects */
-  static async index(req: Request, res: Response): Promise<Response> {
+  /** GET /api/projects — list projects assigned to me */
+  static index: RequestHandler = async (req, res, next) => {
     try {
-      const projects = await Project.findAll();
-      return res.json(projects);
+      const userId = req.user?.id;
+      const user = await User.findByPk(userId);
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+
+      // Fetch projects via the belongsToMany association
+      const projects = await user.getAssignedProjects({
+        order: [['name', 'ASC']],
+      });
+
+      res.json(projects);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Failed to fetch projects' });
+      next(error);
     }
-  }
-
+  };
   /** POST /api/projects — create a new project */
-  static async store(req: Request, res: Response): Promise<Response> {
+  static store: RequestHandler = async (req, res, next) => {
     const { name, description } = req.body;
     if (!name || !description) {
-      return res.status(400).json({ message: 'name and description are required' });
+      res.status(400).json({ message: 'name and description are required' });
+      return;
     }
 
     try {
       const project = await Project.create({ name, description });
-      return res.status(201).json(project);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Failed to create project' });
+      const userId = req.user!.id;
+      await project.addAssignedUser(userId); // Assign the project to the user
+      res.status(201).json(project);
+      // return;
+    } catch (err) {
+      console.error(err);
+      next(err);
+      return;
     }
-  }
+  };
 }

@@ -1,5 +1,7 @@
 import { Router} from 'express';
 import UserController from "../controllers/UserController";
+import ProjectController from "../controllers/ProjectController";
+import {authenticateJWT} from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -19,10 +21,16 @@ const router = Router();
 //     res.status(201).json({ id: user.id, username, email });
 // });
 
-router.get('/',       UserController.index);
-router.get('/:id',    UserController.show);
-router.post('/',      UserController.store);
-router.post('/login', UserController.login);
-router.delete('/:id', UserController.destroy);
+router.get('/users',       UserController.index);
+router.get('/users/:id',    UserController.show);
+router.post('/users',      UserController.store);
+router.post('/users/login', UserController.login);
+router.delete('/users/:id', UserController.destroy);
+
+// Protect everything below with JWT
+router.use(authenticateJWT);
+
+router.get('/projects', ProjectController.index);
+router.post('/projects', ProjectController.store);
 
 export default router;

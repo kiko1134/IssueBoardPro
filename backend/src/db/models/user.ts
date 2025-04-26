@@ -23,6 +23,12 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
         User.hasMany(models.Issue, {foreignKey: 'assignedTo', as: 'AssignedIssues'});
         User.hasMany(models.Issue, {foreignKey: 'assignedBy', as: 'ReportedIssues'});
         User.hasMany(models.Note, {foreignKey: 'userId'});
+        User.belongsToMany(models.Project, {
+            through: models.UserProjects,
+            foreignKey: 'userId',
+            otherKey: 'projectId',
+            as: 'AssignedProjects'
+        });
     }
 
     public static initialize(sequelize: Sequelize) {

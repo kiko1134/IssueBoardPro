@@ -15,6 +15,8 @@ export class Project
     public id!: number;
     public name!: string;
     public description?: string;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
 
 
     static initialize(sequelizeInstance: Sequelize) {
@@ -43,5 +45,11 @@ export class Project
 
     static associate(models: any) {
         Project.hasMany(models.Issue, {foreignKey: 'projectId'});
+        Project.belongsToMany(models.User, {
+            through: models.UserProjects,
+            foreignKey: 'projectId',
+            otherKey: 'userId',
+            as: 'AssignedUsers'
+        });
     }
 }
