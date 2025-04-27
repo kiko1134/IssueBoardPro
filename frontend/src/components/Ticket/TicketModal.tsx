@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
-import {Button, Form, Input, Modal, Select} from "antd";
-import {Task as TaskModel} from '../../api/taskService';
+import {Button, Form, Input, message, Modal, Select} from "antd";
+import {Task as TaskModel, updateTask} from '../../api/taskService';
 
 
 const {TextArea} = Input;
@@ -30,24 +30,22 @@ const TicketModal: React.FC<Props> = ({open, onClose, issue, onSave}) => {
 
     if (!issue) return null;
 
-    const handleOk = () => {
-        form
-            .validateFields()
-            .then((values) => {
-
-                const updated: TaskModel = {
-                    ...issue,
-                    title: values.title,
-                    description: values.description,
-                    type: values.type,
-                    priority: values.priority,
-                };
-                onSave(updated);
-                onClose();
-            })
-            .catch((info) => {
-                console.log("Validate Failed:", info);
+    const handleOk = async() => {
+        try{
+            const values = await form.validateFields();
+            const updated = await updateTask(issue.id, {
+                title: values.title,
+                description: values.description,
+                type: values.type,
+                priority: values.priority,
             });
+            message.success('Ticket updated successfully');
+            onSave(updated);
+            onClose();
+        } catch (error) {
+            console.log(error);
+            message.error('Failed to update ticket');
+        }
     };
 
     return (
