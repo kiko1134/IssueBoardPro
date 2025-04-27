@@ -9,10 +9,18 @@ import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/t
 
 interface IssueBoardContentPageProps {
     projectId: number;
+    searchText: string;
+    typeFilter?: string;
+    priorityFilter?: string;
 }
 
 
-const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({projectId}) => {
+const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
+                                                                         projectId,
+                                                                         searchText,
+                                                                         typeFilter,
+                                                                         priorityFilter
+                                                                     }) => {
     // State for columns and tasks.
     const [columns, setColumns] = useState<ColumnModel[]>([]);
     const [tasks, setTasks] = useState<TaskModel[]>([]);
@@ -43,6 +51,21 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({projectId}
             }
         })();
     }, [projectId]);
+
+    const filteredTasks = tasks.filter(task => {
+        if(searchText){
+            const lowerCaseSearchText = searchText.toLowerCase();
+            if(
+                !task.title.toLowerCase().includes(lowerCaseSearchText) &&
+                !(task.description || '').toLowerCase().includes(lowerCaseSearchText)
+            )
+                return false;
+        }
+        if(typeFilter && task.type !== typeFilter) return false;
+        if(priorityFilter && task.priority !== priorityFilter) return false;
+        return true;
+    });
+
 
 
     // Unified drag end handler to update either columns or tasks.
@@ -144,14 +167,12 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({projectId}
                     <SortableContext items={columns.map((col) => col.id)} strategy={horizontalListSortingStrategy}>
                         <div style={{display: 'flex'}}>
                             {columns.map((column) => {
+                                const tasksInColumn = filteredTasks.filter(task => task.columnId === column.id);
                                 return (
                                     <ColumnContainer
                                         key={column.id}
-                                        // column={column}
                                         column={column}
-                                        // tasks={tasksInColumn}
-                                        tasks = {tasks.filter(t => t.columnId === column.id)}
-                                        // onAddTask={handleAddTask}
+                                        tasks={tasksInColumn}
                                         onAddTask={() => handleAddTask(column.id)}
                                         onTaskClick={handleTaskClick}
                                         addingTaskColumn={addingTaskColumn}

@@ -16,8 +16,6 @@ interface Props {
 const TicketModal: React.FC<Props> = ({open, onClose, issue, onSave}) => {
     const [form] = Form.useForm<TaskModel>();
 
-    // const currentIssue = issue;
-
     // Populate form fields when an issue is selected
     useEffect(() => {
         if (issue) {
@@ -73,7 +71,7 @@ const TicketModal: React.FC<Props> = ({open, onClose, issue, onSave}) => {
             >
                 <Form.Item
                     label="Title"
-                    name="name"
+                    name="title"
                     rules={[{required: true, message: "Title is required"}]}
                 >
                     <Input/>

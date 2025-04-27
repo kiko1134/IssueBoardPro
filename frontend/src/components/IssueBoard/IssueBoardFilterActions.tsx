@@ -1,18 +1,27 @@
 import {Button, Input, Select} from "antd";
-import React, {useState} from "react";
+import React from "react";
 
 const {Option} = Select;
 
-const IssueBoardFilterActions: React.FC = () => {
+interface IssueBoardFilterActionsProps {
+    searchText: string;
+    onSearchChange: (value: string) => void;
+    selectedType?: string;
+    onTypeChange: (value?: string) => void;
+    selectedPriority?: string;
+    onPriorityChange: (value?: string) => void;
+    onClear: () => void;
+}
 
-    const [selectedType, setSelectedType] = useState<string>();
-    const [selectedPriority, setSelectedPriority] = useState<string>();
-
-    const clearFilters = () => {
-        setSelectedType(undefined);
-        setSelectedPriority(undefined);
-    };
-
+const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
+                                                                             searchText,
+                                                                             onSearchChange,
+                                                                             selectedType,
+                                                                             onTypeChange,
+                                                                             selectedPriority,
+                                                                             onPriorityChange,
+                                                                             onClear
+                                                                         }) => {
     return (
         <div style={{
             display: "flex",
@@ -26,33 +35,35 @@ const IssueBoardFilterActions: React.FC = () => {
             <Input
                 placeholder="Search"
                 style={{width: 200, marginRight: '16px'}}
+                value={searchText}
+                onChange={(e) => onSearchChange(e.target.value)}
             />
 
             <Select
                 placeholder="Type"
                 style={{width: 120, marginRight: '16px'}}
                 value={selectedType}
-                onChange={(value) => setSelectedType(value)}
+                onChange={(value) => onTypeChange(value)}
                 allowClear
             >
-                <Option value="bug">Bug</Option>
-                <Option value="feature">Feature</Option>
-                <Option value="task">Task</Option>
+                <Option value="Bug">Bug</Option>
+                <Option value="Feature">Feature</Option>
+                <Option value="Task">Task</Option>
             </Select>
 
             <Select
                 placeholder="Priority"
                 style={{width: 120, marginRight: '16px'}}
                 value={selectedPriority}
-                onChange={(value) => setSelectedPriority(value)}
+                onChange={(value) => onPriorityChange(value)}
                 allowClear
             >
-                <Option value="low">Low</Option>
-                <Option value="medium">Medium</Option>
-                <Option value="high">High</Option>
+                <Option value="Low">Low</Option>
+                <Option value="Medium">Medium</Option>
+                <Option value="High">High</Option>
             </Select>
 
-            <Button onClick={clearFilters} style={{marginRight: 'auto'}}>
+            <Button onClick={onClear} style={{marginRight: 'auto'}}>
                 Clear Filters
             </Button>
         </div>
