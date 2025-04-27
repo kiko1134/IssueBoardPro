@@ -5,7 +5,7 @@ import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../Ticket/TicketModal";
 import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/columnService";
-import {createTask, fetchTasks, Task as TaskModel} from "../../api/taskService";
+import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/taskService";
 
 interface IssueBoardContentPageProps {
     projectId: number;
@@ -72,6 +72,15 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({projectId}
                         task.id === active.id ? {...task, columnId: destinationColumn!} : task
                     )
                 );
+
+                updateTask(Number(active.id), {columnId: destinationColumn})
+                    .then(() => {
+                        message.success('Task moved successfully');
+                    })
+                    .catch(() => {
+                        message.error('Failed to move task');
+                        fetchTasks(projectId).then(setTasks);
+                    });
             }
         }
     };

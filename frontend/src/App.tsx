@@ -4,25 +4,39 @@ import RegisterForm from './components/auth/RegisterForm';
 import IssueTrackerLayout from './components/layout/IssueTrackerLayout';
 import {BrowserRouter, Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import {message} from "antd";
+import {jwtDecode} from 'jwt-decode';
+
+interface DecodedToken {
+    exp: number;  // expiration as Unix timestamp (seconds)
+}
+
+const getValidToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+        const {exp} = jwtDecode<DecodedToken>(token);
+        if (exp * 1000 < Date.now()) {
+            localStorage.removeItem('token');
+            return null;
+        }
+        return token;
+    } catch {
+        localStorage.removeItem('token');
+        return null;
+    }
+}
+
 
 // a little wrapper so we can use `useNavigate` inside our element prop
-const RegisterPage: React.FC<{ onRegisterSuccess?: () => void }> = ({onRegisterSuccess}) => {
-    // const navigate = useNavigate();
-    // return (
-    //     <RegisterForm
-    //         onRegisterSuccess={() => {
-    //             // onRegisterSuccess();
-    //             navigate('/login');
-    //         }}
-    //     />
-    // );
+const RegisterPage: React.FC = () => {
 
     const navigate = useNavigate();
 
     const onSuccess = () => {
         message.success('Registration successful! Please log in.');
         // onRegisterSuccess();
-        navigate('/login',{ replace: true });
+        navigate('/login', {replace: true});
     };
     const switchToLogin = () => navigate('/login');
 
@@ -36,18 +50,39 @@ const RegisterPage: React.FC<{ onRegisterSuccess?: () => void }> = ({onRegisterS
 
 const App: React.FC = () => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() =>
-        Boolean(localStorage.getItem('token'))
-    );
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+        () => !!getValidToken());
 
     // In case another tab logs you out/in
     useEffect(() => {
         const onStorage = () => {
-            setIsLoggedIn(Boolean(localStorage.getItem('token')));
+            setIsLoggedIn(!!getValidToken());
         };
         window.addEventListener('storage', onStorage);
         return () => window.removeEventListener('storage', onStorage);
     }, []);
+
+    useEffect(() => {
+        if (!isLoggedIn) return;
+
+        const token = getValidToken();
+        if (!token) {
+            setIsLoggedIn(false);
+            return;
+        }
+
+        const {exp} = jwtDecode<DecodedToken>(token);
+        const timeout = exp * 1000 - Date.now();
+
+        const timer = setTimeout(() => {
+            //time's up
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            message.error('Session expired. Please log in again.');
+        }, timeout);
+
+        return () => clearTimeout(timer);
+    }, [isLoggedIn]);
 
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
