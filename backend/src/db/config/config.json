@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "dirtjumper1",
+    "password": "your_password",
     "database": "issue_tracker_db",
     "host": "127.0.0.1",
     "dialect": "mysql"
