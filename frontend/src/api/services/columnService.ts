@@ -1,4 +1,4 @@
-import http from "./http";
+import http from "../http";
 
 export interface Column {
     id: number;

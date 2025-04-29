@@ -4,8 +4,8 @@ import {CSS} from "@dnd-kit/utilities";
 import {useDroppable} from "@dnd-kit/core";
 import IssueComponent from "../Issue/IssueComponent";
 import {Button, Card, Input} from "antd";
-import {Column} from "../../../api/columnService";
-import {Task} from "../../../api/taskService";
+import {Column} from "../../../api/services/columnService";
+import {Task} from "../../../api/services/taskService";
 
 
 interface ColumnContainerProps {
@@ -33,7 +33,6 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
                                                              setNewTaskDesc,
                                                              onTaskClick
                                                          }) => {
-    // Make the column draggable (but we'll only attach the drag listeners to the header)
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
         id: column.id,
         data: {type: 'column'},

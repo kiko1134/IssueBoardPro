@@ -16,6 +16,7 @@ const getValidToken = () => {
 
     try {
         const {exp} = jwtDecode<DecodedToken>(token);
+        console.log("Exp",exp);
         if (exp * 1000 < Date.now()) {
             localStorage.removeItem('token');
             return null;
@@ -27,8 +28,6 @@ const getValidToken = () => {
     }
 }
 
-
-// a little wrapper so we can use `useNavigate` inside our element prop
 const RegisterPage: React.FC = () => {
 
     const navigate = useNavigate();

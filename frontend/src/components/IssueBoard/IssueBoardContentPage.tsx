@@ -4,8 +4,8 @@ import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-k
 import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../Ticket/TicketModal";
-import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/columnService";
-import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/taskService";
+import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/services/columnService";
+import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/taskService";
 
 interface IssueBoardContentPageProps {
     projectId: number;
@@ -68,7 +68,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
 
 
 
-    // Unified drag end handler to update either columns or tasks.
+    // drag end handler to update either columns or tasks.
     const handleDragEnd = (event: DragEndEvent) => {
         const {active, over} = event;
         if (!over) return;

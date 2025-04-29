@@ -1,19 +1,19 @@
 import React, {useEffect} from "react";
 import {Button, Form, Input, message, Modal, Select} from "antd";
-import {Task as TaskModel, updateTask} from '../../api/taskService';
+import {Task as TaskModel, updateTask} from '../../api/services/taskService';
 
 
 const {TextArea} = Input;
 const {Option} = Select;
 
-interface Props {
+interface TicketModalProps {
     open: boolean;
     onClose: () => void;
     issue: TaskModel | null;
     onSave: (updatedIssue: TaskModel) => void;
 }
 
-const TicketModal: React.FC<Props> = ({open, onClose, issue, onSave}) => {
+const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave}) => {
     const [form] = Form.useForm<TaskModel>();
 
     // Populate form fields when an issue is selected

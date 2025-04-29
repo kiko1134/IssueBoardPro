@@ -1,7 +1,7 @@
 import {Button, Dropdown, Form, Input, MenuProps, Popconfirm, message, Modal} from "antd";
 import {DownOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
-import {createProject, fetchProjects, Project} from "../../api/projectService";
+import {createProject, fetchProjects, Project} from "../../api/services/projectService";
 
 interface HeaderContentProps {
     onProjectSelect: (projectId: string, projectName: string) => void;

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Card, Form, Input, message, Typography} from 'antd';
-import {login} from "../../api/userService";
+import {login} from "../../api/services/userService";
 
 const {Title} = Typography;
 
