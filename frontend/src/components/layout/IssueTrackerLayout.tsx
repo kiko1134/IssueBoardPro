@@ -7,7 +7,11 @@ import {FundProjectionScreenOutlined} from "@ant-design/icons";
 
 const {Header, Sider, Content} = Layout;
 
-const IssueTrackerLayout: React.FC = () => {
+interface IssueTrackerLayoutProps {
+    onLogout: () => void;
+  }
+
+  const IssueTrackerLayout: React.FC<IssueTrackerLayoutProps> = ({ onLogout }) => {
 
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [selectedProjectName, setSelectedProjectName] = useState<string>('');
@@ -27,7 +31,9 @@ const IssueTrackerLayout: React.FC = () => {
                 <HeaderContent onProjectSelect={(projectId, projectName) => {
                     setSelectedProjectId(projectId);
                     setSelectedProjectName(projectName);
-                }}/>
+                }}
+                onLogout={onLogout}
+                />
             </Header>
 
             {/* Body: Sider + Content */}

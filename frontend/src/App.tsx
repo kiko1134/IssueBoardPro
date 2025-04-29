@@ -143,7 +143,7 @@ const App: React.FC = () => {
                     element={
                         isLoggedIn ? (
                             <IssueTrackerLayout
-                                // onLogout={handleLogout}
+                                 onLogout={handleLogout}
                             />
                         ) : (
                             <Navigate to="/login" replace/>
