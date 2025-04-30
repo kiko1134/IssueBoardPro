@@ -12,6 +12,8 @@ export interface Task {
     workLog?: number;
     createdAt: string;
     updatedAt: string;
+    assignedTo: number;
+    assignedBy: number;
 }
 
 export interface CreateTaskParams {
@@ -22,6 +24,8 @@ export interface CreateTaskParams {
     columnId: number;
     priority: 'Low' | 'Medium' | 'High';
     type: 'Bug' | 'Feature' | 'Task';
+    assignedTo?: number;
+    assignedBy?: number;
     workLog?: number;
 }
 

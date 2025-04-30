@@ -61,19 +61,6 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
         onClick: handleMenuClick,
     };
 
-    // const handleMenuClick = ({ key }: { key: string }) => {
-    //     setSelectedProject(key);
-    //     onProjectSelect(key);
-    // };
-
-    // const menu = (
-    //     <Menu onClick={handleMenuClick} selectedKeys={[selectedProject]}>
-    //         {projects.map((p) => (
-    //             <Menu.Item key={p.name}>{p.name}</Menu.Item>
-    //         ))}
-    //     </Menu>
-    // );
-
     const openModal = () => setIsModalVisible(true);
     const closeModal = () => {
         setIsModalVisible(false);

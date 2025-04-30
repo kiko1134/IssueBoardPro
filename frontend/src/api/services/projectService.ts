@@ -23,3 +23,16 @@ export const createProject = async (
     const { data } = await http.post<Project>('/projects', params);
     return data;
 };
+
+export const fetchProjectMembers = (projectId: number) =>
+    http.get(`/projects/${projectId}/members`).then((res) => res.data);
+
+export const fetchUsers = () => http.get("/users").then((res) => res.data);
+
+export const addProjectMember = (
+    projectId: number,
+    payload: { email: string }
+) =>
+    http
+        .post(`/projects/${projectId}/members`, payload)
+        .then((res) => res.data);

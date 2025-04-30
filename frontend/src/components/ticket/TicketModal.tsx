@@ -1,6 +1,8 @@
 import React, {useEffect} from "react";
 import {Button, Form, Input, message, Modal, Select} from "antd";
-import {Task as TaskModel, updateTask} from '../../api/services/taskService';
+import {Task as TaskModel, updateTask} from '../../api/services/issueService';
+import {fetchProjectMembers} from "../../api/services/projectService";
+import {User} from "../../api/services/userService";
 
 
 const {TextArea} = Input;
@@ -15,15 +17,27 @@ interface TicketModalProps {
 
 const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave}) => {
     const [form] = Form.useForm<TaskModel>();
+    const [users, setUsers] = React.useState<User[]>([]);
+
+    // Load all users for assignment dropdown
+    useEffect(() => {
+        if (!issue) return;
+        fetchProjectMembers(issue.projectId)
+            .then(setUsers)
+            .catch(() => message.error("Failed to load users"));
+    }, [issue]);
 
     // Populate form fields when an issue is selected
     useEffect(() => {
+        form.resetFields();
         if (issue) {
             form.setFieldsValue({
                 title: issue.title,
                 description: issue.description,
                 type: issue.type,
                 priority: issue.priority,
+                assignedTo: issue.assignedTo,
+                assignedBy: issue.assignedBy
             });
         }
     }, [issue, form]);
@@ -38,8 +52,10 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
                 description: values.description,
                 type: values.type,
                 priority: values.priority,
+                assignedTo: values.assignedTo,
+                assignedBy: values.assignedBy,
             });
-            message.success('Ticket updated successfully');
+            message.success('ticket updated successfully');
             onSave(updated);
             onClose();
         } catch (error) {
@@ -53,6 +69,7 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
             title={`Issue #${issue.id}`}
             open={open}
             onCancel={onClose}
+            destroyOnClose={true}
             footer={[
                 <Button key="cancel" onClick={onClose}>
                     Cancel
@@ -104,6 +121,32 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
                         <Option value="Low">Low</Option>
                         <Option value="Medium">Medium</Option>
                         <Option value="High">High</Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    label="Assigned To"
+                    name="assignedTo"
+                    rules={[{ required: true, message: "Assignee is required" }]}
+                >
+                    <Select placeholder="Select assignee">
+                        {users.map((u) => (
+                            <Option key={u.id} value={u.id}>
+                                {u.username}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    label="Assigned By"
+                    name="assignedBy"
+                    rules={[{ required: true, message: "Reporter is required" }]}
+                >
+                    <Select placeholder="Select reporter">
+                        {users.map((u) => (
+                            <Option key={u.id} value={u.id}>
+                                {u.username}
+                            </Option>
+                        ))}
                     </Select>
                 </Form.Item>
             </Form>

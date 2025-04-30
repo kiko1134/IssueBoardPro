@@ -11,6 +11,14 @@ export interface RegisterParams {
     password: string;
 }
 
+export interface User {
+    id: number;
+    username: string;
+    email: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export const login = async ({ email, password }: LoginParams) => {
     const { data } = await http.post<{ token: string; username: string }>('/users/login', { email, password });
     return data;

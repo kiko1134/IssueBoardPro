@@ -61,14 +61,29 @@ export default class IssueController {
     /** PUT /api/issues/:id — update an issue */
     static update: RequestHandler = async (req, res, next) => {
         try {
-            const [updatedCount] = await Issue.update(req.body, {
-                where: { id: req.params.id },
-            });
-            if (!updatedCount) {
-                res.status(404).json({ message: 'Issue not found' });
-                return;
-            }
             const issue = await Issue.findByPk(req.params.id);
+            if (!issue) res.status(404).json({ message: "Issue not found" });
+
+            const {
+                title,
+                description,
+                type,
+                priority,
+                columnId,
+                assignedTo,
+                assignedBy,
+            } = req.body;
+
+            // apply updates
+            issue.title = title ?? issue.title;
+            issue.description = description ?? issue.description;
+            issue.type = type ?? issue.type;
+            issue.priority = priority ?? issue.priority;
+            issue.columnId = columnId ?? issue.columnId;
+            issue.assignedTo = assignedTo ?? issue.assignedTo;
+            issue.assignedBy = assignedBy ?? issue.assignedBy;
+
+            await issue.save();
             res.json(issue);
         } catch (err) {
             next(err);

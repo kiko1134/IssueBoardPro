@@ -3,7 +3,7 @@ import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {Card} from "antd";
 import {MenuOutlined} from "@ant-design/icons"
-import {Task} from "../../../api/services/taskService";
+import {Task} from "../../../api/services/issueService";
 
 
 interface IssueComponentProps {

@@ -3,9 +3,9 @@ import {closestCenter, DndContext, DragEndEvent,} from '@dnd-kit/core';
 import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-kit/sortable';
 import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
-import TicketModal from "../Ticket/TicketModal";
+import TicketModal from "../ticket/TicketModal";
 import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/services/columnService";
-import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/taskService";
+import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/issueService";
 
 interface IssueBoardContentPageProps {
     projectId: number;

@@ -5,7 +5,7 @@ import {useDroppable} from "@dnd-kit/core";
 import IssueComponent from "../Issue/IssueComponent";
 import {Button, Card, Input} from "antd";
 import {Column} from "../../../api/services/columnService";
-import {Task} from "../../../api/services/taskService";
+import {Task} from "../../../api/services/issueService";
 
 
 interface ColumnContainerProps {

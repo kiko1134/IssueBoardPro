@@ -18,6 +18,8 @@ router.use(authenticateJWT);
 
 router.get('/projects', ProjectController.index);
 router.post('/projects', ProjectController.store);
+router.get("/projects/:id/members", ProjectController.members);
+router.post("/projects/:id/members", ProjectController.addMember);
 
 router.get('/issues',  IssueController.index);
 router.get('/issues/:id', IssueController.show);

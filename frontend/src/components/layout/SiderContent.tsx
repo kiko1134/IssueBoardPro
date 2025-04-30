@@ -5,35 +5,21 @@ import {BarChartOutlined, ClockCircleOutlined, TeamOutlined} from "@ant-design/i
 const {Title} = Typography;
 
 const menuItems = [
-    {
-        label: 'Members',
-        key: '1',
-        icon: <TeamOutlined/>
-    },
-    {
-        label: 'Worklog',
-        key: '2',
-        icon: <ClockCircleOutlined/>
-    },
-    {
-        label: 'Stats',
-        key: '3',
-        icon: <BarChartOutlined/>
-    },
+    {label: "Board", key: "board", icon: <BarChartOutlined/>},
+    {label: "Members", key: "members", icon: <TeamOutlined/>},
+    {label: "Worklog", key: "worklog", icon: <ClockCircleOutlined/>},
 ];
 
 interface SiderContentProps {
     projectName: string;
     icon?: React.ReactNode;
     collapsed?: boolean;
+    onMenuSelect: (key: string) => void;
+    activeKey: string;
 }
 
-const SiderContent: React.FC<SiderContentProps> = ({projectName, icon, collapsed}) => {
+const SiderContent: React.FC<SiderContentProps> = ({projectName, icon, collapsed, onMenuSelect, activeKey}) => {
     return (
-        // <>
-        //     <div><h3 style={{paddingLeft: 10, marginBottom: 16, color: "white"}}>{projectName}</h3></div>
-        //     <Menu theme="dark" items={menuItems} mode="inline"/>
-        // </>
         <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
             <div
                 style={{
@@ -55,6 +41,8 @@ const SiderContent: React.FC<SiderContentProps> = ({projectName, icon, collapsed
                 theme="dark"
                 mode="inline"
                 items={menuItems}
+                selectedKeys={[activeKey]}
+                onClick={({key}) => onMenuSelect(key)}
                 style={{flex: 1, paddingLeft: collapsed ? 0 : 20}}
             />
         </div>
