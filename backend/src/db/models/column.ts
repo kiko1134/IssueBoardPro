@@ -4,6 +4,7 @@ interface ColumnAttributes {
     id: number;
     name: string;
     projectId: number;
+    position: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -16,6 +17,7 @@ export class Column
     public id!: number;
     public name!: string;
     public projectId!: number;
+    public position!: number;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -35,6 +37,11 @@ export class Column
                 projectId: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     allowNull: false,
+                },
+                position: {
+                    type: DataTypes.INTEGER.UNSIGNED,
+                    allowNull: false,
+                    defaultValue: 0,
                 },
             },
             {

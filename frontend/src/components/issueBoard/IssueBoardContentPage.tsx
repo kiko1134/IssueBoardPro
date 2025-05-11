@@ -19,7 +19,12 @@ import {
 import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../ticket/TicketModal";
-import {Column as ColumnModel, createColumn, fetchColumns} from "../../api/services/columnService";
+import {
+    Column as ColumnModel,
+    createColumn,
+    fetchColumns,
+    reorderColumns,
+} from "../../api/services/columnService";
 import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/issueService";
 
 interface IssueBoardContentPageProps {
@@ -114,7 +119,18 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
             setColumns(prevCols => {
                 const oldIndex = prevCols.findIndex(c => `column-${c.id}` === activeId);
                 const newIndex = prevCols.findIndex(c => `column-${c.id}` === overId);
-                return arrayMove(prevCols, oldIndex, newIndex);
+                const next = arrayMove(prevCols, oldIndex, newIndex);
+
+                // Bulk‐persist the new positions:
+                reorderColumns(
+                    next.map((col, idx) => ({ id: col.id, position: idx }))
+                ).catch(() => {
+                    message.error('Failed saving column order');
+                    // Optionally reload columns here:
+                    fetchColumns(projectId).then(setColumns);
+                });
+
+                return next;
             });
 
         } else if (type === 'task') {
