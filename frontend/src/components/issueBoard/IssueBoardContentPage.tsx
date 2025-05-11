@@ -1,6 +1,21 @@
 import React, {useEffect, useState} from 'react';
-import {closestCenter, DndContext, DragEndEvent,} from '@dnd-kit/core';
-import {arrayMove, horizontalListSortingStrategy, SortableContext,} from '@dnd-kit/sortable';
+import {
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    KeyboardSensor,
+    PointerSensor,
+    pointerWithin,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    horizontalListSortingStrategy,
+    SortableContext,
+    sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
 import {Button, Card, Input, message} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../ticket/TicketModal";
@@ -36,6 +51,13 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
 
     const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
 
+    const [activeTask, setActiveTask] = useState<TaskModel | null>(null);
+    // DnD sensors
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {coordinateGetter: sortableKeyboardCoordinates})
+    );
+
     // Load columns & tasks on mount or project change
     useEffect(() => {
         (async () => {
@@ -53,55 +75,73 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     }, [projectId]);
 
     const filteredTasks = tasks.filter(task => {
-        if(searchText){
+        if (searchText) {
             const lowerCaseSearchText = searchText.toLowerCase();
-            if(
+            if (
                 !task.title.toLowerCase().includes(lowerCaseSearchText) &&
                 !(task.description || '').toLowerCase().includes(lowerCaseSearchText)
             )
                 return false;
         }
-        if(typeFilter && task.type !== typeFilter) return false;
-        if(priorityFilter && task.priority !== priorityFilter) return false;
+        if (typeFilter && task.type !== typeFilter) return false;
+        if (priorityFilter && task.priority !== priorityFilter) return false;
         return true;
     });
 
+    const handleDragStart = (event: DragStartEvent) => {
+        const {active} = event;
+        if (active.data.current?.type === 'task') {
+            const taskId = Number((active.id as string).replace(/^task-/, ''));
+            const task = tasks.find(t => t.id === taskId);
+            setActiveTask(task || null);
+        }
+    };
 
-
-    // drag end handler to update either columns or tasks.
     const handleDragEnd = (event: DragEndEvent) => {
         const {active, over} = event;
-        if (!over) return;
-        const activeType = active.data.current?.type;
-        if (activeType === 'column') {
-            // Reorder columns.
-            if (active.id !== over.id) {
-                setColumns((prev) => {
-                    const oldIndex = prev.findIndex((col) => col.id === active.id);
-                    const newIndex = prev.findIndex((col) => col.id === over.id);
-                    return arrayMove(prev, oldIndex, newIndex);
-                });
-            }
-        } else if (activeType === 'task') {
-            // For tasks, determine source and destination columns.
-            const sourceColumn = active.data.current?.containerId;
-            // The over target can be a task or a column.
-            const overType = over.data.current?.type;
-            let destinationColumn = overType === 'task' ?
-                over.data.current?.containerId : Number(over.id);
-            if (sourceColumn && destinationColumn && sourceColumn !== destinationColumn) {
-                setTasks((prev) =>
-                    prev.map((task) =>
-                        task.id === active.id ? {...task, columnId: destinationColumn!} : task
-                    )
-                );
+        // clear any task overlay
+        setActiveTask(null);
 
-                updateTask(Number(active.id), {columnId: destinationColumn})
-                    .then(() => {
-                        message.success('Task moved successfully');
-                    })
+        if (!over) return;
+
+        // grab our metadata
+        const type = active.data.current?.type;
+        const activeId = active.id as string;  // e.g. "column-3" or "task-17"
+        const overId = over.id as string;
+
+        if (type === 'column' && activeId !== overId) {
+            // Reorder columns array
+            setColumns(prevCols => {
+                const oldIndex = prevCols.findIndex(c => `column-${c.id}` === activeId);
+                const newIndex = prevCols.findIndex(c => `column-${c.id}` === overId);
+                return arrayMove(prevCols, oldIndex, newIndex);
+            });
+
+        } else if (type === 'task') {
+            // parse the numeric task ID
+            const taskId = Number(activeId.replace(/^task-/, ''));
+            // determine target column
+            let destCol: number | undefined;
+
+            if (over.data.current?.type === 'task') {
+                // dropped onto another task → use its containerId
+                destCol = over.data.current.containerId;
+            } else if (overId.startsWith('column-')) {
+                // dropped onto a column wrapper
+                destCol = Number(overId.replace(/^column-/, ''));
+            }
+
+            const srcCol = active.data.current?.containerId;
+            if (srcCol && destCol && srcCol !== destCol) {
+                // update local state
+                setTasks(ts =>
+                    ts.map(t => t.id === taskId ? {...t, columnId: destCol!} : t)
+                );
+                // persist
+                updateTask(taskId, {columnId: destCol})
+                    .then(() => message.success('Task moved'))
                     .catch(() => {
-                        message.error('Failed to move task');
+                        message.error('Move failed');
                         fetchTasks(projectId).then(setTasks);
                     });
             }
@@ -150,6 +190,8 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         setSelectedTask(null);
     }
 
+    const handleDragCancel = () => setActiveTask(null);
+
 
     const handleSave = (updatedTask: TaskModel) => {
         setTasks((prev) =>
@@ -162,17 +204,23 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     return (
         <>
             <div style={{height: 'calc(100% - 50px)', overflowX: 'auto', display: 'flex'}}>
-                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    {/* Wrap columns in a SortableContext (for horizontal column reordering) */}
-                    <SortableContext items={columns.map((col) => col.id)} strategy={horizontalListSortingStrategy}>
-                        <div style={{display: 'flex'}}>
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={pointerWithin}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDragCancel={handleDragCancel}
+                >
+                    <SortableContext items={columns.map((col) => `column-${col.id}`)}
+                                     strategy={horizontalListSortingStrategy}>
+                        <div style={{display: 'flex', overflow: "hidden"}}>
                             {columns.map((column) => {
-                                const tasksInColumn = filteredTasks.filter(task => task.columnId === column.id);
                                 return (
                                     <ColumnContainer
                                         key={column.id}
                                         column={column}
-                                        tasks={tasksInColumn}
+                                        id={`column-${column.id}`}
+                                        tasks={filteredTasks.filter(task => task.columnId === column.id)}
                                         onAddTask={() => handleAddTask(column.id)}
                                         onTaskClick={handleTaskClick}
                                         addingTaskColumn={addingTaskColumn}
@@ -202,7 +250,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
                                 ) : (
                                     <Button
                                         type="dashed"
-                                        style={{width: 300, height: '100%'}}
+                                        style={{width: 300, height: 60}}
                                         onClick={() => setAddingColumn(true)}
                                     >
                                         + Add another column
@@ -211,6 +259,20 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
                             </div>
                         </div>
                     </SortableContext>
+                    <DragOverlay>
+                        {activeTask ? (
+                            <div
+                                style={{
+                                    padding: 8,
+                                    background: '#fff',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                    borderRadius: 4,
+                                }}
+                            >
+                                {activeTask.title}
+                            </div>
+                        ) : null}
+                    </DragOverlay>
                 </DndContext>
             </div>
             <TicketModal

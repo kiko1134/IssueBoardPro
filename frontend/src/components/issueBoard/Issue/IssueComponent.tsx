@@ -13,9 +13,8 @@ interface IssueComponentProps {
 }
 
 const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
-    // Pass containerId as part of the data so we know which column this task is in.
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
-        id: issue.id,
+        id: `task-${issue.id}`,
         data: {type: 'task', containerId: issue.columnId},
     });
     const style: React.CSSProperties = {
@@ -35,14 +34,8 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
                 style={{padding: 6, cursor: "pointer", backgroundColor: '#e6f7ff'}}
                 title={<strong>{issue.title}</strong>}
                 extra={
-                    <span
-                        {...attributes}
-                        {...listeners}
-                        style={{cursor: "grab", padding: "4px"}}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-            <MenuOutlined/>
-          </span>
+                    <MenuOutlined {...attributes} {...listeners} style={{cursor: "grab", padding: "4px"}}
+                                  onClick={(e) => e.stopPropagation()}/>
                 }
             >
                 <div style={{fontSize: 12, color: "#666", marginTop: 4}}>

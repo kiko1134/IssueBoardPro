@@ -4,7 +4,7 @@ import db from '../db/models';
 const { Column } = db;
 
 export default class ColumnController {
-    /** GET /api/columns — list all columns (optionally filter by ?projectId=) */
+    /** GET /api/columns/projectId= — list all columns*/
     static index: RequestHandler = async (req, res, next) => {
         try {
             const where: any = {};

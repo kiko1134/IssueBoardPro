@@ -10,8 +10,9 @@ import {Task} from "../../../api/services/issueService";
 
 interface ColumnContainerProps {
     column: Column;
+    id: string;
     tasks: Task[];
-    onAddTask: (columnId:number) => void;
+    onAddTask: (columnId: number) => void;
     onTaskClick: (task: Task) => void;
     addingTaskColumn: number | null;
     setAddingTaskColumn: (columnId: number | null) => void;
@@ -31,16 +32,26 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
                                                              setNewTaskName,
                                                              newTaskDesc,
                                                              setNewTaskDesc,
-                                                             onTaskClick
+                                                             onTaskClick,
+                                                             id
                                                          }) => {
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
-        id: column.id,
+    const {
+        attributes,
+        listeners,
+        setNodeRef, transform,
+        transition
+    } = useSortable({
+        id: id,
         data: {type: 'column'},
     });
+
+    const isEmpty = tasks.length === 0;
+
     const columnStyle: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,
         width: 300,
+        minHeight: 200,
         margin: 8,
         background: '#fafafa',
         border: '1px solid #f0f0f0',
@@ -48,7 +59,6 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
         padding: 8,
         display: 'flex',
         flexDirection: 'column',
-        overflowY: "auto"
     };
 
     // Also register this column as a droppable area for tasks.
@@ -68,7 +78,12 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
 
             {/* Tasks in this column */}
             <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-                <div style={{minHeight: 50}}>
+                <div style={{
+                    flexGrow: 1,
+                    minHeight: 0,     // necessary to allow flex children to scroll
+                    overflowY: "auto",
+                    marginTop: 8,
+                }}>
                     {tasks.map((issue) => (
                         <IssueComponent key={issue.id} issue={issue} onClick={() => onTaskClick(issue)}/>
                     ))}
@@ -76,35 +91,46 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
             </SortableContext>
 
             {/* "Add Task" section */}
-            {addingTaskColumn === column.id ? (
-                <Card style={{padding: 8, marginTop: 8}}>
-                    <Input
-                        placeholder="Task name"
-                        value={newTaskName}
-                        onChange={(e) => setNewTaskName(e.target.value)}
-                    />
-                    <Input
-                        placeholder="Description"
-                        value={newTaskDesc}
-                        onChange={(e) => setNewTaskDesc(e.target.value)}
-                        style={{marginTop: 4}}
-                    />
-                    <div style={{marginTop: 8, display: 'flex', gap: 8}}>
-                        <Button type="primary" onClick={() => onAddTask(column.id)}>
-                            Add Task
-                        </Button>
-                        <Button onClick={() => setAddingTaskColumn(null)}>Cancel</Button>
-                    </div>
-                </Card>
-            ) : (
-                <Button
-                    type="dashed"
-                    style={{width: '100%', marginTop: 8}}
-                    onClick={() => setAddingTaskColumn(column.id)}
-                >
-                    + Add task
-                </Button>
-            )}
+            <div
+                style={{
+                    position: "sticky",
+                    bottom: 0,
+                    marginTop: 8,
+                    background: "#fafafa",
+                    paddingTop: 8,
+                    zIndex: 1,
+                }}
+            >
+                {addingTaskColumn === column.id ? (
+                    <Card style={{padding: 8, marginTop: 8}}>
+                        <Input
+                            placeholder="Task name"
+                            value={newTaskName}
+                            onChange={(e) => setNewTaskName(e.target.value)}
+                        />
+                        <Input
+                            placeholder="Description"
+                            value={newTaskDesc}
+                            onChange={(e) => setNewTaskDesc(e.target.value)}
+                            style={{marginTop: 4}}
+                        />
+                        <div style={{marginTop: 8, display: 'flex', gap: 8}}>
+                            <Button type="primary" onClick={() => onAddTask(column.id)}>
+                                Add Task
+                            </Button>
+                            <Button onClick={() => setAddingTaskColumn(null)}>Cancel</Button>
+                        </div>
+                    </Card>
+                ) : (
+                    <Button
+                        type="dashed"
+                        style={{width: '100%', marginTop: 8}}
+                        onClick={() => setAddingTaskColumn(column.id)}
+                    >
+                        + Add task
+                    </Button>
+                )}
+            </div>
         </div>
     );
 };

@@ -6,6 +6,7 @@ export interface Column {
     projectId: number;
     createdAt: string;
     updatedAt: string;
+
 }
 
 export interface CreateColumnParams {
@@ -14,7 +15,7 @@ export interface CreateColumnParams {
 }
 
 export const fetchColumns = async (projectId: number): Promise<Column[]> => {
-    const { data } = await http.get<Column[]>(`/columns?id=${projectId}`);
+    const { data } = await http.get<Column[]>(`/columns?projectId=${projectId}`);
     return data;
 };
 
