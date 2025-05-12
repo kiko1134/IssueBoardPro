@@ -45,7 +45,7 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick, onDelete
                     <Typography.Text strong style={{margin: 0}}>
                         {issue.title}
                     </Typography.Text>
-
+                    
                     <Space size="small">
                         <Popconfirm
                             title="Delete this task?"
