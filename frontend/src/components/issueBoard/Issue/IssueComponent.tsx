@@ -72,7 +72,7 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick, onDelete
                             {...attributes}
                             {...listeners}
                             style={{cursor: 'grab', fontSize: 16, color: '#999'}}
-                            onClick={e => e.stopPropagation()} // prevent card click
+                            onClick={e => e.stopPropagation()}
                         />
                     </Space>
                 </div>

@@ -17,7 +17,7 @@ interface IssueBoardFilterActionsProps {
     onClear: () => void;
 }
 
-const AVATAR_COLORS = [
+export const AVATAR_COLORS = [
     "#f56a00",
     "#7265e6",
     "#ffbf00",

@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {Avatar, Button, Input, List, message} from "antd";
+import {Avatar, Button, Input, List, message, Space, Typography} from "antd";
 import {addProjectMember, fetchProjectMembers, fetchUsers} from "../../api/services/projectService";
+import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
+import {User} from "../../api/services/userService";
 
 interface MembersPageProps {
     projectId: number;
@@ -30,34 +32,43 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
             .catch(() => message.error("Failed to add member"));
     };
 
+
     return (
-        <div>
-            <h2>Project Members</h2>
-            <List
+        <div style={{padding: 16}}>
+            <Typography.Title level={4}>Project Members</Typography.Title>
+
+            <List<User>
                 itemLayout="horizontal"
                 dataSource={members}
-                renderItem={(user) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={<Avatar>{user.username.charAt(0)}</Avatar>}
-                            title={user.username}
-                            description={user.email}
-                        />
-                    </List.Item>
-                )}
+                renderItem={(user) => {
+                    const color = AVATAR_COLORS[user.id % AVATAR_COLORS.length];
+                    return (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={
+                                    <Avatar style={{backgroundColor: color, verticalAlign: 'middle'}}>
+                                        {user.username.charAt(0).toUpperCase()}
+                                    </Avatar>
+                                }
+                                title={<Typography.Text strong>{user.username}</Typography.Text>}
+                                description={<Typography.Text type="secondary">{user.email}</Typography.Text>}
+                            />
+                        </List.Item>
+                    );
+                }}
             />
 
-            <div style={{marginTop: 16, display: "flex", gap: 8}}>
+            <Space style={{marginTop: 24}}>
                 <Input
                     placeholder="User email"
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
-                    style={{width: 200}}
+                    style={{width: 240}}
                 />
-                <Button type="primary" onClick={handleAdd} disabled={!newMemberEmail}>
+                <Button type="primary" onClick={handleAdd} disabled={!newMemberEmail.trim()}>
                     Add Member
                 </Button>
-            </div>
+            </Space>
         </div>
     );
 };

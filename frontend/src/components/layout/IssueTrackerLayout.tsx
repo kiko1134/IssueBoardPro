@@ -5,6 +5,7 @@ import SiderContent from "../layout/SiderContent";
 import IssueBoardIndexPage from "../issueBoard/IssueBoardIndexPage";
 import {FundProjectionScreenOutlined} from "@ant-design/icons";
 import MembersPage from "../members/MembersPage";
+import WorklogSection from "../worklog/WorklogSection";
 
 const {Header, Sider, Content} = Layout;
 
@@ -61,7 +62,10 @@ const IssueTrackerLayout: React.FC<IssueTrackerLayoutProps> = ({onLogout}) => {
                         {activeMenuKey === 'members' ? (
                                 <MembersPage projectId={Number(selectedProjectId)}/>
                             ) :
-                            (<IssueBoardIndexPage projectId={(Number(selectedProjectId))}/>)
+                            activeMenuKey === 'worklog' ?
+                                <WorklogSection/>
+                                :
+                                (<IssueBoardIndexPage projectId={(Number(selectedProjectId))}/>)
                         }
                     </Content>
                 </Layout>
