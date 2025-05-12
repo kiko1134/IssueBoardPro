@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Avatar, Button, Input, List, message, Space, Typography} from "antd";
-import {addProjectMember, fetchProjectMembers, fetchUsers} from "../../api/services/projectService";
+import {addProjectMember, fetchProjectMembers} from "../../api/services/projectService";
 import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
 import {User} from "../../api/services/userService";
 
@@ -10,16 +10,13 @@ interface MembersPageProps {
 
 const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
     const [members, setMembers] = useState<any[]>([]);
-    const [allUsers, setAllUsers] = useState<any[]>([]);
+    // const [allUsers, setAllUsers] = useState<any[]>([]);
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
 
     useEffect(() => {
         fetchProjectMembers(projectId)
             .then(setMembers)
             .catch(() => message.error("Failed to load members"));
-        fetchUsers()
-            .then(setAllUsers)
-            .catch(() => message.error("Failed to load users"));
     }, [projectId]);
 
     const handleAdd = () => {

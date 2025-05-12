@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     DndContext,
     DragEndEvent,
@@ -16,7 +16,7 @@ import {
     SortableContext,
     sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import {Button, Card, Input, message} from 'antd';
+import {Button, Card, Input, message, Spin} from 'antd';
 import ColumnContainer from "./Column/ColumnContainer";
 import TicketModal from "../ticket/TicketModal";
 import {
@@ -67,21 +67,41 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         useSensor(KeyboardSensor, {coordinateGetter: sortableKeyboardCoordinates})
     );
 
-    // Load columns & tasks on mount or project change
+    //Loading state
+    const [loading, setLoading] = useState(true);
+    const isMounted = useRef(false);
+
     useEffect(() => {
-        (async () => {
-            try {
-                setColumns(await fetchColumns(projectId));
-            } catch {
-                message.error('Failed to load columns');
-            }
-            try {
-                setTasks(await fetchTasks(projectId));
-            } catch {
-                message.error('Failed to load tasks');
-            }
-        })();
+        isMounted.current = false;
+        setLoading(true);
+
+        Promise.all([
+            fetchColumns(projectId),
+            fetchTasks(projectId),
+        ])
+            .then(([cols, ts]) => {
+                if (!isMounted.current) {
+                    setColumns(cols);
+                    setTasks(ts);
+                }
+            })
+            .catch((err) => {
+                if (!isMounted.current) {
+                    console.error(err);
+                    message.error('Failed to load board data');
+                }
+            })
+            .finally(() => {
+                if (!isMounted.current) {
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted.current = true;
+        };
     }, [projectId]);
+
 
     const filteredTasks = tasks.filter(task => {
         if (searchText) {
@@ -256,80 +276,93 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
 
     return (
         <>
-            <div style={{height: 'calc(100% - 50px)', overflowX: 'auto', display: 'flex'}}>
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={pointerWithin}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    onDragCancel={handleDragCancel}
-                >
-                    <SortableContext items={columns.map((col) => `column-${col.id}`)}
-                                     strategy={horizontalListSortingStrategy}>
-                        <div style={{display: 'flex', overflowX: "auto", flexWrap: 'nowrap'}}>
-                            {columns.map((column) => {
-                                return (
-                                    <ColumnContainer
-                                        key={column.id}
-                                        column={column}
-                                        id={`column-${column.id}`}
-                                        tasks={filteredTasks.filter(task => task.columnId === column.id)}
-                                        onAddTask={() => handleAddTask(column.id)}
-                                        onTaskClick={handleTaskClick}
-                                        addingTaskColumn={addingTaskColumn}
-                                        setAddingTaskColumn={setAddingTaskColumn}
-                                        newTaskName={newTaskName}
-                                        setNewTaskName={setNewTaskName}
-                                        newTaskDesc={newTaskDesc}
-                                        setNewTaskDesc={setNewTaskDesc}
-                                        onRenameColumn={handleRenameColumn}
-                                        onDeleteColumn={handleDeleteColumn}
-                                        onDeleteTask={handleDeleteTask}
-                                    />
-                                );
-                            })}
-                            <div style={{margin: 8}}>
-                                {addingColumn ? (
-                                    <Card style={{width: 300, padding: 8}}>
-                                        <Input
-                                            placeholder="Enter column name..."
-                                            value={newColumnTitle}
-                                            onChange={(e) => setNewColumnTitle(e.target.value)}
+            <div style={{height: 'calc(100% - 50px)', overflowX: "auto", overflowY: "hidden", display: 'flex'}}>
+                {loading ? (
+                    <div
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Spin/>
+                    </div>
+                ) : (
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={pointerWithin}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        onDragCancel={handleDragCancel}
+                    >
+                        <SortableContext items={columns.map((col) => `column-${col.id}`)}
+                                         strategy={horizontalListSortingStrategy}>
+                            <div style={{display: 'flex', overflowX: "auto", flexWrap: 'nowrap'}}>
+                                {columns.map((column) => {
+                                    return (
+                                        <ColumnContainer
+                                            key={column.id}
+                                            column={column}
+                                            id={`column-${column.id}`}
+                                            tasks={filteredTasks.filter(task => task.columnId === column.id)}
+                                            onAddTask={() => handleAddTask(column.id)}
+                                            onTaskClick={handleTaskClick}
+                                            addingTaskColumn={addingTaskColumn}
+                                            setAddingTaskColumn={setAddingTaskColumn}
+                                            newTaskName={newTaskName}
+                                            setNewTaskName={setNewTaskName}
+                                            newTaskDesc={newTaskDesc}
+                                            setNewTaskDesc={setNewTaskDesc}
+                                            onRenameColumn={handleRenameColumn}
+                                            onDeleteColumn={handleDeleteColumn}
+                                            onDeleteTask={handleDeleteTask}
                                         />
-                                        <div style={{marginTop: 8, display: 'flex', gap: 8}}>
-                                            <Button type="primary" onClick={handleAddColumn}>
-                                                Add Column
-                                            </Button>
-                                            <Button onClick={() => setAddingColumn(false)}>Cancel</Button>
-                                        </div>
-                                    </Card>
-                                ) : (
-                                    <Button
-                                        type="dashed"
-                                        style={{width: 300, height: 60}}
-                                        onClick={() => setAddingColumn(true)}
-                                    >
-                                        + Add another column
-                                    </Button>
-                                )}
+                                    );
+                                })}
+                                <div style={{margin: 8}}>
+                                    {addingColumn ? (
+                                        <Card style={{width: 300, padding: 8}}>
+                                            <Input
+                                                placeholder="Enter column name..."
+                                                value={newColumnTitle}
+                                                onChange={(e) => setNewColumnTitle(e.target.value)}
+                                            />
+                                            <div style={{marginTop: 8, display: 'flex', gap: 8}}>
+                                                <Button type="primary" onClick={handleAddColumn}>
+                                                    Add Column
+                                                </Button>
+                                                <Button onClick={() => setAddingColumn(false)}>Cancel</Button>
+                                            </div>
+                                        </Card>
+                                    ) : (
+                                        <Button
+                                            type="dashed"
+                                            style={{width: 300, height: 60}}
+                                            onClick={() => setAddingColumn(true)}
+                                        >
+                                            + Add column
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </SortableContext>
-                    <DragOverlay>
-                        {activeTask ? (
-                            <div
-                                style={{
-                                    padding: 8,
-                                    background: '#fff',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                    borderRadius: 4,
-                                }}
-                            >
-                                {activeTask.title}
-                            </div>
-                        ) : null}
-                    </DragOverlay>
-                </DndContext>
+                        </SortableContext>
+                        <DragOverlay>
+                            {activeTask ? (
+                                <div
+                                    style={{
+                                        padding: 8,
+                                        background: '#fff',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                        borderRadius: 4,
+                                    }}
+                                >
+                                    {activeTask.title}
+                                </div>
+                            ) : null}
+                        </DragOverlay>
+                    </DndContext>
+                )}
             </div>
             <TicketModal
                 open={!!selectedTask}

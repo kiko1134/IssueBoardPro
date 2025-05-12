@@ -1,8 +1,8 @@
-import React, {useEffect} from "react";
+import React from "react";
 import IssueBoardFilterActions from "./IssueBoardFilterActions";
 import IssueBoardContentPage from "./IssueBoardContentPage";
-import {User} from "../../api/services/userService";
-import {fetchProjectMembers} from "../../api/services/projectService";
+
+;
 
 interface IssueBoardIndexPageProps {
     projectId: number;
@@ -15,7 +15,6 @@ const IssueBoardIndexPage: React.FC<IssueBoardIndexPageProps> = ({projectId}) =>
     const [typeFilter, setTypeFilter] = React.useState<string | undefined>(undefined);
     const [priorityFilter, setPriorityFilter] = React.useState<string | undefined>(undefined);
     const [userFilters, setUserFilters] = React.useState<number[]>([]);
-    const [users, setUsers] = React.useState<User[]>([]);
     const clearFilters = () => {
         setSearchText('');
         setTypeFilter(undefined);
@@ -23,16 +22,10 @@ const IssueBoardIndexPage: React.FC<IssueBoardIndexPageProps> = ({projectId}) =>
         setUserFilters([]);
     }
 
-    useEffect(() => {
-        fetchProjectMembers(projectId)
-            .then(setUsers)
-            .catch(() => console.error("Failed to load users"));
-    }, [projectId]);
-
     return (
         <>
             <IssueBoardFilterActions
-                users={users}
+                projectId={projectId}
                 selectedUsers={userFilters}
                 onUserChange={setUserFilters}
                 searchText={searchText}
@@ -42,11 +35,13 @@ const IssueBoardIndexPage: React.FC<IssueBoardIndexPageProps> = ({projectId}) =>
                 selectedPriority={priorityFilter}
                 onPriorityChange={setPriorityFilter}
                 onClear={clearFilters}/>
-            <IssueBoardContentPage projectId={projectId}
-                                   searchText={searchText}
-                                   typeFilter={typeFilter}
-                                   priorityFilter={priorityFilter}
-                                   userFilters={userFilters}
+
+            <IssueBoardContentPage
+                projectId={projectId}
+                searchText={searchText}
+                typeFilter={typeFilter}
+                priorityFilter={priorityFilter}
+                userFilters={userFilters}
             />
         </>
     )

@@ -1,11 +1,12 @@
-import {Avatar, Button, Input, Select, Tooltip} from "antd";
-import React from "react";
+import {Avatar, Button, Input, message, Select, Spin, Tooltip} from "antd";
+import React, {useEffect, useRef, useState} from "react";
 import {User} from "../../api/services/userService";
+import {fetchProjectMembers} from "../../api/services/projectService";
 
 const {Option} = Select;
 
 interface IssueBoardFilterActionsProps {
-    users: User[];
+    projectId: number,
     selectedUsers: number[],
     onUserChange: (value: number[]) => void;
     searchText: string;
@@ -31,7 +32,7 @@ export const AVATAR_COLORS = [
 ];
 
 const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
-                                                                             users,
+                                                                             projectId,
                                                                              selectedUsers,
                                                                              onUserChange,
                                                                              searchText,
@@ -42,6 +43,32 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                                                                              onPriorityChange,
                                                                              onClear
                                                                          }) => {
+
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(false);
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        isMounted.current = true;
+        setLoading(true);
+        fetchProjectMembers(projectId)
+            .then((data) => {
+                if (isMounted.current) setUsers(data);
+            })
+            .catch(() => {
+                if (isMounted.current) message.error('Failed to load users');
+            })
+            .finally(() => {
+                if (isMounted.current) setLoading(false);
+            });
+    }, [projectId]);
+
     return (
         <div style={{
             display: "flex",
@@ -51,7 +78,6 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
             alignItems: "center",
             height: "50px"
         }}>
-            {/* Filters: Search, Type, Priority */}
             <Input
                 placeholder="Search"
                 style={{
@@ -62,35 +88,40 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                 onChange={(e) => onSearchChange(e.target.value)}
             />
 
-            <div style={{display: "flex", alignItems: "center", gap: 4}}>
-                {users.map((user) => {
-                    const selected = selectedUsers.includes(user.id);
-                    const bgColor = AVATAR_COLORS[user.id % AVATAR_COLORS.length];
-                    return (
-                        <Tooltip key={user.id} title={user.username}>
-                            <Avatar
-                                src={`https://api.adorable.io/avatars/40/${user.username}.png`}
-                                style={{
-                                    backgroundColor: bgColor,
-                                    verticalAlign: "middle",
-                                    cursor: "pointer",
-                                    // border: selected ? "2px solid #1890ff" : undefined
-                                    border: selected ? "2px solid black" : undefined
-                                }}
-                                onClick={() => {
-                                    if (selectedUsers.includes(user.id)) {
-                                        onUserChange(selectedUsers.filter((id) => id !== user.id));
-                                    } else {
-                                        onUserChange([...selectedUsers, user.id]);
-                                    }
-                                }}
-                            >
-                                {user.username[0].toUpperCase()}
-                            </Avatar>
-                        </Tooltip>
-                    )
-                })}
-            </div>
+            {
+                loading ? (
+                    <Spin spinning={loading} size="small"/>
+                ) : (
+                    <div style={{display: "flex", alignItems: "center", gap: 4}}>
+                        {users.map((user) => {
+                            const selected = selectedUsers.includes(user.id);
+                            const bgColor = AVATAR_COLORS[user.id % AVATAR_COLORS.length];
+                            return (
+                                <Tooltip key={user.id} title={user.username}>
+                                    <Avatar
+                                        src={`https://api.adorable.io/avatars/40/${user.username}.png`}
+                                        style={{
+                                            backgroundColor: bgColor,
+                                            verticalAlign: "middle",
+                                            cursor: "pointer",
+                                            border: selected ? "2px solid black" : undefined
+                                        }}
+                                        onClick={() => {
+                                            if (selectedUsers.includes(user.id)) {
+                                                onUserChange(selectedUsers.filter((id) => id !== user.id));
+                                            } else {
+                                                onUserChange([...selectedUsers, user.id]);
+                                            }
+                                        }}
+                                    >
+                                        {user.username[0].toUpperCase()}
+                                    </Avatar>
+                                </Tooltip>
+                            )
+                        })}
+                    </div>
+                )
+            }
 
             <Select
                 placeholder="Type"
