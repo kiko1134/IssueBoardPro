@@ -16,7 +16,7 @@ const getValidToken = () => {
 
     try {
         const {exp} = jwtDecode<DecodedToken>(token);
-        console.log("Exp",exp);
+        // console.log("Exp",exp);
         if (exp * 1000 < Date.now()) {
             localStorage.removeItem('token');
             return null;

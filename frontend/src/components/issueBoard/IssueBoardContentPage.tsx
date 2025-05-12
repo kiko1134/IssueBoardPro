@@ -22,16 +22,19 @@ import TicketModal from "../ticket/TicketModal";
 import {
     Column as ColumnModel,
     createColumn,
+    deleteColumn,
     fetchColumns,
     reorderColumns,
+    updateColumn,
 } from "../../api/services/columnService";
-import {createTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/issueService";
+import {createTask, deleteTask, fetchTasks, Task as TaskModel, updateTask} from "../../api/services/issueService";
 
 interface IssueBoardContentPageProps {
     projectId: number;
     searchText: string;
     typeFilter?: string;
     priorityFilter?: string;
+    userFilters: number[];
 }
 
 
@@ -39,7 +42,8 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
                                                                          projectId,
                                                                          searchText,
                                                                          typeFilter,
-                                                                         priorityFilter
+                                                                         priorityFilter,
+                                                                         userFilters
                                                                      }) => {
     // State for columns and tasks.
     const [columns, setColumns] = useState<ColumnModel[]>([]);
@@ -90,6 +94,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         }
         if (typeFilter && task.type !== typeFilter) return false;
         if (priorityFilter && task.priority !== priorityFilter) return false;
+        if (userFilters.length > 0 && !userFilters.includes(task.assignedTo)) return false;
         return true;
     });
 
@@ -123,7 +128,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
 
                 // Bulk‐persist the new positions:
                 reorderColumns(
-                    next.map((col, idx) => ({ id: col.id, position: idx }))
+                    next.map((col, idx) => ({id: col.id, position: idx}))
                 ).catch(() => {
                     message.error('Failed saving column order');
                     // Optionally reload columns here:
@@ -216,6 +221,38 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         closeModal();
     };
 
+    const handleRenameColumn = async (columnId: number, newName: string) => {
+        try {
+            const updatedColumn = await updateColumn(columnId, {name: newName});
+            setColumns((columns) =>
+                columns.map((column) => (column.id === updatedColumn.id ? updatedColumn : column))
+            );
+            message.success('Column renamed successfully');
+        } catch (error) {
+            message.error('Failed to rename column');
+        }
+    };
+
+    const handleDeleteColumn = async (id: number) => {
+        try {
+            await deleteColumn(id);
+            setColumns((columns) => columns.filter((column) => column.id !== id));
+            message.success('Column deleted successfully');
+        } catch (error) {
+            message.error('Failed to delete column');
+        }
+    };
+
+    const handleDeleteTask = async (taskId: number) => {
+        try {
+            await deleteTask(taskId);
+            setTasks((tasks) => tasks.filter((task) => task.id !== taskId));
+            message.success('Task deleted successfully');
+        } catch (error) {
+            message.error('Failed to delete task');
+        }
+    }
+
 
     return (
         <>
@@ -229,7 +266,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
                 >
                     <SortableContext items={columns.map((col) => `column-${col.id}`)}
                                      strategy={horizontalListSortingStrategy}>
-                        <div style={{display: 'flex', overflow: "hidden"}}>
+                        <div style={{display: 'flex', overflowX: "auto", flexWrap: 'nowrap'}}>
                             {columns.map((column) => {
                                 return (
                                     <ColumnContainer
@@ -245,6 +282,9 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
                                         setNewTaskName={setNewTaskName}
                                         newTaskDesc={newTaskDesc}
                                         setNewTaskDesc={setNewTaskDesc}
+                                        onRenameColumn={handleRenameColumn}
+                                        onDeleteColumn={handleDeleteColumn}
+                                        onDeleteTask={handleDeleteTask}
                                     />
                                 );
                             })}

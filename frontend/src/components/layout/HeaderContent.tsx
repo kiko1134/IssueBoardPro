@@ -1,4 +1,4 @@
-import {Button, Dropdown, Form, Input, MenuProps, Popconfirm, message, Modal} from "antd";
+import {Button, Dropdown, Form, Input, MenuProps, message, Modal, Popconfirm} from "antd";
 import {DownOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {createProject, fetchProjects, Project} from "../../api/services/projectService";
@@ -38,25 +38,25 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
     const menuProps: MenuProps = {
         items,
         selectedKeys: [selectedProjectId],
-        onClick: ({ key }) => {
+        onClick: ({key}) => {
             const projectId = key as string;
             const proj = projects.find(p => p.id.toString() === projectId);
-            if(proj){
+            if (proj) {
                 setSelectedProjectId(projectId);
                 onProjectSelect(projectId, proj.name);
             }
         }
     };
 
-    const handleMenuClick = ({ key }: { key: string }) => {
+    const handleMenuClick = ({key}: { key: string }) => {
         if (key === 'logout') {
             setShowLogoutConfirm(true);
         }
     };
-    
+
     const profileMenuProps: MenuProps = {
         items: [
-          { key: 'logout', label: 'Logout' },
+            {key: 'logout', label: 'Logout'},
         ],
         onClick: handleMenuClick,
     };
@@ -76,7 +76,7 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
             await loadProjects();
             const idStr = newProj.id.toString();
             setSelectedProjectId(idStr);
-            onProjectSelect(idStr,newProj.name);
+            onProjectSelect(idStr, newProj.name);
         } catch (error: any) {
             message.error(error?.response?.data?.message || 'Failed to create project');
         }
@@ -85,49 +85,49 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
     const selectedLabel = projects.find(p => p.id.toString() === selectedProjectId)?.name;
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', marginRight: '16px' }}>
+        <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+            <div style={{fontSize: '20px', fontWeight: 'bold', marginRight: '16px'}}>
                 Issue Tracker
             </div>
 
             <Dropdown menu={menuProps} trigger={['click']}>
-                <Button type="text" style={{ marginRight: 16 }}>
-                    {selectedLabel || 'Select Project'} <DownOutlined />
+                <Button type="text" style={{marginRight: 16}}>
+                    {selectedLabel || 'Select Project'} <DownOutlined/>
                 </Button>
             </Dropdown>
 
             <Button
                 type="primary"
-                icon={<PlusOutlined />}
-                style={{ marginRight: '16px' }}
+                icon={<PlusOutlined/>}
+                style={{marginRight: '16px'}}
                 onClick={openModal}
             >
                 Create Project
             </Button>
 
             {showLogoutConfirm ? (
-        <Popconfirm
-          title="Are you sure you want to logout?"
-          onConfirm={() => {
-            setShowLogoutConfirm(false);
-            onLogout();
-          }}
-          onCancel={() => setShowLogoutConfirm(false)}
-          okText="Yes"
-          cancelText="No"
-          open={true}
-        >
-          <Button style={{ marginLeft: 'auto' }}>
-            CV <DownOutlined />
-          </Button>
-        </Popconfirm>
-      ) : (
-        <Dropdown menu={profileMenuProps} trigger={['click']}>
-          <Button style={{ marginLeft: 'auto' }}>
-            CV <DownOutlined />
-          </Button>
-        </Dropdown>
-      )}
+                <Popconfirm
+                    title="Are you sure you want to logout?"
+                    onConfirm={() => {
+                        setShowLogoutConfirm(false);
+                        onLogout();
+                    }}
+                    onCancel={() => setShowLogoutConfirm(false)}
+                    okText="Yes"
+                    cancelText="No"
+                    open={true}
+                >
+                    <Button style={{marginLeft: 'auto'}}>
+                        CV <DownOutlined/>
+                    </Button>
+                </Popconfirm>
+            ) : (
+                <Dropdown menu={profileMenuProps} trigger={['click']}>
+                    <Button style={{marginLeft: 'auto'}}>
+                        CV <DownOutlined/>
+                    </Button>
+                </Dropdown>
+            )}
 
             <Modal
                 title="Create New Project"
@@ -140,13 +140,13 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
                     <Form.Item
                         name="name"
                         label="Project Name"
-                        rules={[{ required: true, message: 'Please enter a project name' }]}
+                        rules={[{required: true, message: 'Please enter a project name'}]}
                     >
-                        <Input placeholder="My Project" />
+                        <Input placeholder="My Project"/>
                     </Form.Item>
 
                     <Form.Item name="description" label="Description">
-                        <Input.TextArea placeholder="Describe your project" rows={3} />
+                        <Input.TextArea placeholder="Describe your project" rows={3}/>
                     </Form.Item>
                 </Form>
             </Modal>

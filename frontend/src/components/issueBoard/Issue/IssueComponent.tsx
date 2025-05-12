@@ -1,18 +1,19 @@
 import React from "react";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
-import {Card} from "antd";
-import {MenuOutlined} from "@ant-design/icons"
+import {Card, Popconfirm, Space, Typography} from "antd";
+import {DeleteOutlined, MenuOutlined} from "@ant-design/icons"
 import {Task} from "../../../api/services/issueService";
 
 
 interface IssueComponentProps {
     issue: Task;
     onClick: () => void;
+    onDelete: () => void;
 
 }
 
-const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
+const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick, onDelete}) => {
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
         id: `task-${issue.id}`,
         data: {type: 'task', containerId: issue.columnId},
@@ -32,15 +33,55 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick}) => {
                 hoverable
                 onClick={onClick}
                 style={{padding: 6, cursor: "pointer", backgroundColor: '#e6f7ff'}}
-                title={<strong>{issue.title}</strong>}
-                extra={
-                    <MenuOutlined {...attributes} {...listeners} style={{cursor: "grab", padding: "4px"}}
-                                  onClick={(e) => e.stopPropagation()}/>
-                }
             >
-                <div style={{fontSize: 12, color: "#666", marginTop: 4}}>
-                    {issue.description}
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: 8,
+                    }}
+                >
+                    <Typography.Text strong style={{margin: 0}}>
+                        {issue.title}
+                    </Typography.Text>
+
+                    <Space size="small">
+                        <Popconfirm
+                            title="Delete this task?"
+                            onConfirm={(e) => {
+                                e?.stopPropagation();
+                                onDelete();
+                            }}
+                            okText="Yes"
+                            cancelText="No"
+                            onCancel={(e) => {
+                                e?.stopPropagation();
+                            }}
+                        >
+                            <span onClick={e => {
+                                e.stopPropagation();
+                            }}>
+                            <DeleteOutlined
+                                style={{color: '#ff4d4f', fontSize: 16, cursor: 'pointer'}}
+                            />
+                                </span>
+                        </Popconfirm>
+
+                        <MenuOutlined
+                            {...attributes}
+                            {...listeners}
+                            style={{cursor: 'grab', fontSize: 16, color: '#999'}}
+                            onClick={e => e.stopPropagation()} // prevent card click
+                        />
+                    </Space>
                 </div>
+                
+                {issue.description && (
+                    <Typography.Paragraph style={{margin: 0, whiteSpace: 'pre-wrap'}}>
+                        {issue.description}
+                    </Typography.Paragraph>
+                )}
             </Card>
         </div>
     );

@@ -48,3 +48,7 @@ export const updateTask = async (
     const { data } = await http.put<Task>(`/issues/${id}`, params);
     return data;
 };
+
+export const deleteTask = async (id: number): Promise<void> => {
+    await http.delete(`/issues/${id}`);
+}

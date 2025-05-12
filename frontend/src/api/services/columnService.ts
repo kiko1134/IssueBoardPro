@@ -32,15 +32,19 @@ export const createColumn = async (
     return data;
 };
 
-// export const updateColumnOrder = async (
-//     id: number,
-//     params: UpdateColumnParams
-// ): Promise<Column> => {
-//     const {data} = await http.put(`/columns/${id}`, params);
-//     return data;
-// };
-
 export const reorderColumns = async (
-    updates: { id: number; position: number }[]) => {
-        await http.put('/columns/reorder', updates);
-    }
+    updates: { id: number; position: number }[]): Promise<void> => {
+    await http.put('/columns/reorder', updates);
+}
+
+export const updateColumn = async (
+    id: number,
+    params: UpdateColumnParams
+): Promise<Column> => {
+    const {data} = await http.put(`/columns/${id}`, params);
+    return data;
+}
+
+export const deleteColumn = async (id: number): Promise<void> => {
+    await http.delete(`/columns/${id}`);
+}
