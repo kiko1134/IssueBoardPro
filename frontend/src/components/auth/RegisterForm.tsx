@@ -69,15 +69,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({onRegisterSuccess, onSwitchT
                 </Title>
 
                 <Form layout="vertical" onFinish={onFinish}>
-                    <Form.Item name="name" label="Name" rules={[{required: true}]}>
-                        <Input placeholder="Enter your name" size="large" style={{borderRadius: 4}}/>
+                    <Form.Item name="name" label="Username" rules={[
+                        {required: true},
+                        { pattern: /^[\x00-\x7F]+$/, message: 'Username must contain only English characters' }
+                    ]}>
+                        <Input placeholder="Enter your username" size="large" style={{borderRadius: 4}}/>
                     </Form.Item>
 
-                    <Form.Item name="email" label="Email" rules={[{required: true, type: 'email'}]}>
+                    <Form.Item name="email" label="Email" rules={[
+                        {required: true, type: 'email'},
+                        { pattern: /^[\x00-\x7F]+$/, message: 'Email must contain only English characters' }
+                    ]}>
                         <Input placeholder="Enter your email" size="large" style={{borderRadius: 4}}/>
                     </Form.Item>
 
-                    <Form.Item name="password" label="Password" rules={[{required: true, min: 6}]}>
+                    <Form.Item name="password" label="Password" rules={[
+                        {required: true, min: 6},
+                        { pattern: /^[\x00-\x7F]+$/, message: 'Password must contain only English characters' }
+                    ]}>
                         <Input.Password placeholder="Enter your password" size="large" style={{borderRadius: 4}}/>
                     </Form.Item>
 
