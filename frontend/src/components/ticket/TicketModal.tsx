@@ -22,7 +22,6 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
   const [workLogMinutes, setWorkLogMinutes] = React.useState<number>(
     issue?.workLog ? Math.round(issue.workLog * 60) : 0
   );
-  // new entry: hours and minutes
   const [newHours, setNewHours] = React.useState<number>(0);
   const [newMinutes, setNewMinutes] = React.useState<number>(0);
 
@@ -46,6 +45,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
         assignedTo: issue.assignedTo,
         assignedBy: issue.assignedBy,
       });
+      // convert stored hours (decimal) to total minutes
       setWorkLogMinutes(issue.workLog ? Math.round(issue.workLog * 60) : 0);
       setNewHours(0);
       setNewMinutes(0);
@@ -57,16 +57,17 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      // convert total minutes back to decimal hours
-      const workLogDecimal = workLogMinutes / 60;
+      // send total minutes
+      const workLogToSend = workLogMinutes;
+
       const updated = await updateTask(issue.id, {
-        title: values.title,
+        title:       values.title,
         description: values.description,
-        type: values.type,
-        priority: values.priority,
-        assignedTo: values.assignedTo,
-        assignedBy: values.assignedBy,
-        workLog: workLogDecimal,
+        type:        values.type,
+        priority:    values.priority,
+        assignedTo:  values.assignedTo,
+        assignedBy:  values.assignedBy,
+        workLog:     workLogToSend,
       });
       message.success("Ticket updated successfully");
       onSave(updated);
@@ -173,18 +174,18 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
               value={newHours}
               onChange={(v) => setNewHours(v ?? 0)}
               style={{ width: 80 }}
-              placeholder="ч."
+              placeholder="h"
             />
-            <span>ч.</span>
+            <span>h</span>
             <InputNumber
               min={0}
               max={59}
               value={newMinutes}
               onChange={(v) => setNewMinutes(v ?? 0)}
               style={{ width: 80 }}
-              placeholder="мин."
+              placeholder="min"
             />
-            <span>мин.</span>
+            <span>min</span>
             <Button
               type="primary"
               onClick={() => {
@@ -197,7 +198,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
               OK
             </Button>
             <span>
-              Current: {displayHours} ч. {displayMinutes} мин.
+              Current: {displayHours} h {displayMinutes} min
             </span>
           </div>
         </Form.Item>

@@ -1,53 +1,74 @@
-import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
-import React from "react";
-import {Avatar, Card, List,Typography} from "antd";
+// frontend/src/components/worklog/WorklogSection.tsx
+import React, { useEffect, useState } from "react";
+import { Card, List, Avatar, Typography, Spin, message } from "antd";
+import { fetchTasks, Task } from "../../api/services/issueService";
+import { fetchProjectMembers } from "../../api/services/projectService";
+import { User } from "../../api/services/userService";
+import { AVATAR_COLORS } from "../issueBoard/IssueBoardFilterActions";
 
 interface UserWorklog {
-    id: number;
-    username: string;
-    totalMinutes: number;
+  id: number;
+  username: string;
+  totalMinutes: number;
 }
 
-// Mocked data until backend is ready
-const mockedWorklogs: UserWorklog[] = [
-    { id: 1, username: 'Ivan', totalMinutes: 320 },
-    { id: 2, username: 'Martin', totalMinutes: 210 },
-    { id: 3, username: 'Georgi', totalMinutes: 480 },
-];
+interface WorklogSectionProps {
+  projectId: number;
+}
 
+const WorklogSection: React.FC<WorklogSectionProps> = ({ projectId }) => {
+  const [loading, setLoading] = useState(true);
+  const [worklogs, setWorklogs] = useState<UserWorklog[]>([]);
 
-const WorklogSection: React.FC = () => {
-    return (
-        <Card title="Worklog Summary" style={{ marginTop: 16 }}>
-            <List<UserWorklog>
-                dataSource={mockedWorklogs}
-                renderItem={item => {
-                    // Convert minutes to hours and minutes
-                    const hours = Math.floor(item.totalMinutes / 60);
-                    const minutes = item.totalMinutes % 60;
-                    const color = AVATAR_COLORS[item.id % AVATAR_COLORS.length];
+  useEffect(() => {
+    Promise.all([fetchTasks(projectId), fetchProjectMembers(projectId)])
+      .then(([tasks, members]) => {
+        const minsByUser: Record<number, number> = {};
+        tasks.forEach((t: Task) => {
+          const mins = Math.round((t.workLog || 0) * 60);
+          minsByUser[t.assignedTo] = (minsByUser[t.assignedTo] || 0) + mins;
+        });
+        const data: UserWorklog[] = members.map((u: User) => ({
+          id: u.id,
+          username: u.username,
+          totalMinutes: minsByUser[u.id] || 0,
+        }));
+        setWorklogs(data);
+      })
+      .catch(err => {
+        console.error(err);
+        message.error("Failed to load worklog data");
+      })
+      .finally(() => setLoading(false));
+  }, [projectId]);
 
-                    return (
-                        <List.Item>
-                            <List.Item.Meta
-                                avatar={
-                                    <Avatar style={{ backgroundColor: color, verticalAlign: 'middle' }}>
-                                        {item.username.charAt(0).toUpperCase()}
-                                    </Avatar>
-                                }
-                                title={
-                                    <Typography.Text strong style={{ marginRight: 16 }}>
-                                        {item.username}
-                                    </Typography.Text>
-                                }
-                                description={<Typography.Text>{hours}h {minutes}m</Typography.Text>}
-                            />
-                        </List.Item>
-                    );
-                }}
-            />
-        </Card>
-    );
+  if (loading) return <Spin style={{ margin: "auto" }} />;
+
+  return (
+    <Card title="Worklog Summary" style={{ marginTop: 16 }}>
+      <List<UserWorklog>
+        dataSource={worklogs}
+        renderItem={item => {
+          const hours = Math.floor(item.totalMinutes / 60);
+          const minutes = item.totalMinutes % 60;
+          const color = AVATAR_COLORS[item.id % AVATAR_COLORS.length];
+          return (
+            <List.Item>
+              <List.Item.Meta
+                avatar={
+                  <Avatar style={{ backgroundColor: color }}>
+                    {item.username.charAt(0).toUpperCase()}
+                  </Avatar>
+                }
+                title={<Typography.Text strong>{item.username}</Typography.Text>}
+                description={`${hours}h ${minutes}m`}
+              />
+            </List.Item>
+          );
+        }}
+      />
+    </Card>
+  );
 };
 
 export default WorklogSection;
