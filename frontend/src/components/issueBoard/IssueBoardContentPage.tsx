@@ -35,6 +35,8 @@ import {
   updateTask,
 } from "../../api/services/issueService";
 
+import WorklogSection from "../worklog/WorklogSection";
+
 interface IssueBoardContentPageProps {
   projectId: number;
   searchText: string;
@@ -50,6 +52,9 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
   priorityFilter,
   userFilters,
 }) => {
+
+  const [reloadKey, setReloadKey] = useState(0);
+
   const [columns, setColumns] = useState<ColumnModel[]>([]);
   const [tasks, setTasks] = useState<TaskModel[]>([]);
   const [addingColumn, setAddingColumn] = useState(false);
@@ -67,6 +72,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  
   useEffect(() => {
     isMounted.current = false;
     setLoading(true);
@@ -108,6 +114,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     if (userFilters.length && !userFilters.includes(task.assignedTo)) return false;
     return true;
   });
+
 
   const handleDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.type === "task") {
@@ -167,7 +174,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         columnId,
         priority: "Medium",
         type: "Task",
-        workLog: 0, // initial workLog in hours
+        workLog: 0,
       });
       setTasks((prev) => [...prev, task]);
       setNewTaskName("");
@@ -177,6 +184,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
       message.error("Failed to create task");
     }
   };
+
 
   const handleAddColumn = async () => {
     if (!newColumnTitle.trim()) return;
@@ -190,12 +198,17 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     }
   };
 
+  
   const handleTaskClick = (task: TaskModel) => setSelectedTask(task);
   const closeModal = () => setSelectedTask(null);
+
+
   const handleSave = (updated: TaskModel) => {
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+    setReloadKey((k) => k + 1);
     closeModal();
   };
+
 
   const handleRenameColumn = async (columnId: number, newName: string) => {
     try {
@@ -217,6 +230,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
     }
   };
 
+  
   const handleDeleteTask = async (taskId: number) => {
     try {
       await deleteTask(taskId);
@@ -315,6 +329,7 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
         onClose={closeModal}
         onSave={handleSave}
       />
+
     </>
   );
 };

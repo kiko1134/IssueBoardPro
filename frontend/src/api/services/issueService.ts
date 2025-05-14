@@ -9,7 +9,7 @@ export interface Task {
     columnId: number;
     priority: 'Low' | 'Medium' | 'High';
     type: 'Bug' | 'Feature' | 'Task';
-    workLog?: number;
+    workLog: number;
     createdAt: string;
     updatedAt: string;
     assignedTo: number;
@@ -52,3 +52,13 @@ export const updateTask = async (
 export const deleteTask = async (id: number): Promise<void> => {
     await http.delete(`/issues/${id}`);
 }
+
+export const updateTaskWorkLog = async (
+  id: number,
+  workLog: number
+): Promise<Task> => {
+  const { data } = await http.patch<Task>(`/issues/${id}/worklog`, {
+    workLog,
+  });
+  return data;
+};

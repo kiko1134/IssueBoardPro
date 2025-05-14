@@ -57,7 +57,7 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
             type: DataTypes.ENUM('Bug', 'Feature', 'Task'),
             allowNull: false,
         },
-        worklog: {
+        workLog: {
             type: DataTypes.INTEGER,
             allowNull: true,
         },

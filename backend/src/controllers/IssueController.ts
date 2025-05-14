@@ -40,7 +40,7 @@ export default class IssueController {
             priority, type, workLog, columnId,
         } = req.body;
 
-        // require minimally
+
         if (!title || !statusId || !projectId || !priority || !type) {
             res.status(400).json({ message: 'Missing required fields' });
             return;
@@ -72,9 +72,10 @@ export default class IssueController {
                 columnId,
                 assignedTo,
                 assignedBy,
+                workLog,
             } = req.body;
 
-            // apply updates
+  
             issue.title = title ?? issue.title;
             issue.description = description ?? issue.description;
             issue.type = type ?? issue.type;
@@ -82,6 +83,9 @@ export default class IssueController {
             issue.columnId = columnId ?? issue.columnId;
             issue.assignedTo = assignedTo ?? issue.assignedTo;
             issue.assignedBy = assignedBy ?? issue.assignedBy;
+            if (workLog !== undefined) {  
+                issue.workLog = workLog;
+            }
 
             await issue.save();
             res.json(issue);
@@ -89,6 +93,30 @@ export default class IssueController {
             next(err);
         }
     };
+
+    /** PATCH /api/issues/:id/worklog — update only the workLog field */
+  static updateWorkLog: RequestHandler = async (req, res, next) => {
+    try {
+      const issue = await Issue.findByPk(req.params.id);
+      if (!issue) {
+        res.status(404).json({ message: 'Issue not found' });
+      }
+
+      const { workLog } = req.body;
+      if (typeof workLog !== 'number') {
+        res
+          .status(400)
+          .json({ message: 'Invalid workLog value (must be a number)' });
+      }
+
+      issue.workLog = workLog;
+      await issue.save();
+
+      res.json(issue);
+    } catch (err) {
+      next(err);
+    }
+  };
 
     /** DELETE /api/issues/:id — delete an issue */
     static destroy: RequestHandler = async (req, res, next) => {

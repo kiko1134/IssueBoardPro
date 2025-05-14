@@ -27,6 +27,8 @@ router.post('/issues', IssueController.store);
 router.put('/issues/:id', IssueController.update);
 router.delete('/issues/:id', IssueController.destroy);
 
+router.patch('/issues/:id/worklog', IssueController.updateWorkLog);
+
 router.put('/columns/reorder', ColumnController.reorder);
 
 router.get('/columns', ColumnController.index);

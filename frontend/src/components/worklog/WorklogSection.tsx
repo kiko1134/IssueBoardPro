@@ -1,4 +1,3 @@
-// frontend/src/components/worklog/WorklogSection.tsx
 import React, { useEffect, useState } from "react";
 import { Card, List, Avatar, Typography, Spin, message } from "antd";
 import { fetchTasks, Task } from "../../api/services/issueService";
@@ -14,13 +13,18 @@ interface UserWorklog {
 
 interface WorklogSectionProps {
   projectId: number;
+  reloadKey?: number;       
 }
 
-const WorklogSection: React.FC<WorklogSectionProps> = ({ projectId }) => {
+const WorklogSection: React.FC<WorklogSectionProps> = ({
+  projectId,
+  reloadKey,               
+}) => {
   const [loading, setLoading] = useState(true);
   const [worklogs, setWorklogs] = useState<UserWorklog[]>([]);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([fetchTasks(projectId), fetchProjectMembers(projectId)])
       .then(([tasks, members]) => {
         const minsByUser: Record<number, number> = {};
@@ -40,7 +44,7 @@ const WorklogSection: React.FC<WorklogSectionProps> = ({ projectId }) => {
         message.error("Failed to load worklog data");
       })
       .finally(() => setLoading(false));
-  }, [projectId]);
+  }, [projectId, reloadKey]); 
 
   if (loading) return <Spin style={{ margin: "auto" }} />;
 

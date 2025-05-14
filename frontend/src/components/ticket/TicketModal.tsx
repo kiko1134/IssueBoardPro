@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, Form, Input, InputNumber, message, Modal, Select } from "antd";
-import { Task as TaskModel, updateTask } from "../../api/services/issueService";
+import { Task as TaskModel, updateTask, updateTaskWorkLog } from "../../api/services/issueService";
 import { fetchProjectMembers } from "../../api/services/projectService";
 import { User } from "../../api/services/userService";
 
@@ -18,14 +18,12 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
   const [form] = Form.useForm<TaskModel>();
   const [users, setUsers] = React.useState<User[]>([]);
 
-  // workLog stored internally as total minutes
   const [workLogMinutes, setWorkLogMinutes] = React.useState<number>(
-    issue?.workLog ? Math.round(issue.workLog * 60) : 0
+    issue?.workLog ?? 0
   );
   const [newHours, setNewHours] = React.useState<number>(0);
   const [newMinutes, setNewMinutes] = React.useState<number>(0);
 
-  // load project members
   useEffect(() => {
     if (!issue) return;
     fetchProjectMembers(issue.projectId)
@@ -33,7 +31,6 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
       .catch(() => message.error("Failed to load users"));
   }, [issue]);
 
-  // reset form and workLog when issue changes
   useEffect(() => {
     form.resetFields();
     if (issue) {
@@ -45,8 +42,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
         assignedTo: issue.assignedTo,
         assignedBy: issue.assignedBy,
       });
-      // convert stored hours (decimal) to total minutes
-      setWorkLogMinutes(issue.workLog ? Math.round(issue.workLog * 60) : 0);
+      setWorkLogMinutes(issue.workLog ?? 0);
       setNewHours(0);
       setNewMinutes(0);
     }
@@ -57,18 +53,17 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      // send total minutes
-      const workLogToSend = workLogMinutes;
 
-      const updated = await updateTask(issue.id, {
+      await updateTask(issue.id, {
         title:       values.title,
         description: values.description,
         type:        values.type,
         priority:    values.priority,
         assignedTo:  values.assignedTo,
         assignedBy:  values.assignedBy,
-        workLog:     workLogToSend,
       });
+      const updated = await updateTaskWorkLog(issue.id, workLogMinutes);
+
       message.success("Ticket updated successfully");
       onSave(updated);
       onClose();
@@ -78,7 +73,24 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
     }
   };
 
-  // display hours and minutes
+  const handleAddWorkLog = async () => {
+    const added = newHours * 60 + newMinutes;
+    const newTotal = workLogMinutes + added;
+
+    console.log("issue", issue);
+
+    try {
+      const updated = await updateTaskWorkLog(issue.id, newTotal);
+      setWorkLogMinutes(updated.workLog);
+      setNewHours(0);
+      setNewMinutes(0);
+      message.success("Worklog updated");
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to update worklog");
+    }
+  };
+
   const displayHours = Math.floor(workLogMinutes / 60);
   const displayMinutes = workLogMinutes % 60;
 
@@ -166,7 +178,6 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
           </Select>
         </Form.Item>
 
-        {/* Worklog: hours + minutes */}
         <Form.Item label="Worklog">
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <InputNumber
@@ -188,12 +199,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ open, onClose, issue, onSave 
             <span>min</span>
             <Button
               type="primary"
-              onClick={() => {
-                const added = newHours * 60 + newMinutes;
-                setWorkLogMinutes((prev) => prev + added);
-                setNewHours(0);
-                setNewMinutes(0);
-              }}
+              onClick={handleAddWorkLog}
             >
               OK
             </Button>
