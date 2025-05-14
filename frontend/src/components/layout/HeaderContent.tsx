@@ -1,7 +1,9 @@
-import {Button, Dropdown, Form, Input, MenuProps, message, Modal, Popconfirm} from "antd";
-import {DownOutlined, PlusOutlined} from "@ant-design/icons";
+import {Avatar, Button, Dropdown, Form, Input, MenuProps, message, Modal, Popconfirm} from "antd";
+import {DownOutlined, PlusOutlined,LogoutOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {createProject, fetchProjects, Project} from "../../api/services/projectService";
+import {jwtDecode} from "jwt-decode";
+import { AVATAR_COLORS } from "../issueBoard/IssueBoardFilterActions";
 
 interface HeaderContentProps {
     onProjectSelect: (projectId: string, projectName: string) => void;
@@ -16,6 +18,25 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+    let username = 'User';
+    let email = 'user@example.com';
+    let id = 0;
+
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const decoded = jwtDecode<any>(token);
+            if (decoded.username) username = decoded.username;
+            if (decoded.email) email = decoded.email;
+            if (decoded.id) id = decoded.id;
+        } catch (err) {
+            console.warn('Invalid token');
+        }
+    }
+
+    const firstLetter = username.charAt(0).toUpperCase();
+
 
     useEffect(() => {
         loadProjects();
@@ -56,7 +77,20 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
 
     const profileMenuProps: MenuProps = {
         items: [
-            {key: 'logout', label: 'Logout'},
+            {
+                key: 'user-info',
+                label: (
+                    <div style={{ padding: '8px 12px', pointerEvents: 'none' }}>
+                        <div style={{ fontWeight: 'bold' }}>{username}</div>
+                        <div style={{ fontSize: '12px', color: '#888' }}>{email}</div>
+                    </div>
+                ),
+            },
+            // { type: 'divider' },
+            // { key: 'profile', label: 'My Profile', icon: <UserOutlined /> },
+            // { key: 'settings', label: 'Settings', icon: <SettingOutlined /> },
+            { type: 'divider' },
+            { key: 'logout', label: 'Logout', icon: <LogoutOutlined /> },
         ],
         onClick: handleMenuClick,
     };
@@ -117,15 +151,15 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
                     cancelText="No"
                     open={true}
                 >
-                    <Button style={{marginLeft: 'auto'}}>
-                        CV <DownOutlined/>
-                    </Button>
+                    <Avatar style={{ marginLeft: 'auto', backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length], cursor: 'pointer' }}>
+                        {firstLetter}
+                    </Avatar>
                 </Popconfirm>
             ) : (
                 <Dropdown menu={profileMenuProps} trigger={['click']}>
-                    <Button style={{marginLeft: 'auto'}}>
-                        CV <DownOutlined/>
-                    </Button>
+                    <Avatar style={{ marginLeft: 'auto', backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length], cursor: 'pointer' }}>
+                        {firstLetter}
+                    </Avatar>
                 </Dropdown>
             )}
 

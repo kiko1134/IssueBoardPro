@@ -85,12 +85,12 @@ export default class UserController {
             }
 
             const token = jwt.sign(
-                {id: user.id, username: user.username},
+                {id: user.id, username: user.username, email: user.email},
                 process.env.JWT_SECRET || 'default-secret',
                 {expiresIn: '15m'}
             );
 
-            res.json({token, username: user.username});
+            res.json({token, username: user.username, email: user.email, id: user.id});
         } catch (error) {
             next(error);
         }

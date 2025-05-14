@@ -48,11 +48,17 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister
             }}>
                 <Title level={2} style={{textAlign: 'center', marginBottom: '24px'}}>Welcome Back</Title>
                 <Form layout="vertical" onFinish={onFinish}>
-                    <Form.Item name="email" label="Email" rules={[{required: true, type: 'email'}]}>
+                    <Form.Item name="email" label="Email" rules={[
+                        {required: true, type: 'email'},
+                        {pattern: /^[\x00-\x7F]+$/, message: 'Email must contain only English characters' }
+                        ]}>
                         <Input placeholder="Enter your email"/>
                     </Form.Item>
 
-                    <Form.Item name="password" label="Password" rules={[{required: true, min: 6}]}>
+                    <Form.Item name="password" label="Password" rules={[
+                        {required: true, min: 6},
+                        { pattern: /^[\x00-\x7F]+$/, message: 'Password must contain only English characters' }
+                    ]}>
                         <Input.Password placeholder="Enter your password"/>
                     </Form.Item>
 
