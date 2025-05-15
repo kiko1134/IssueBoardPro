@@ -10,7 +10,6 @@ interface MembersPageProps {
 
 const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
     const [members, setMembers] = useState<any[]>([]);
-    // const [allUsers, setAllUsers] = useState<any[]>([]);
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
 
     useEffect(() => {

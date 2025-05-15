@@ -22,6 +22,7 @@ router.post('/projects', ProjectController.store);
 router.get("/projects/:id/members", ProjectController.members);
 router.post("/projects/:id/members", ProjectController.addMember);
 router.get("/projects/:projectId/worklogs", WorklogController.projectWorklogSummary);
+router.get("/projects/:projectId/users/:userId/worklogs", WorklogController.listUserWorklogs);
 
 router.get('/issues', IssueController.index);
 router.get('/issues/:id', IssueController.show);

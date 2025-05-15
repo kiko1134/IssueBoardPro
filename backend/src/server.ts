@@ -3,13 +3,13 @@ import  cors from 'cors';
 import dotenv from 'dotenv';
 
 import db from './db/models';
-import userRouter from './routes/router';
+import router from './routes/router';
 
 dotenv.config();
 
 const app = express();
 
-// Allow React frontend to access this API
+// Allow React frontend to access this APр
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
@@ -26,7 +26,7 @@ db.sequelize
         process.exit(1);
     });
 
-app.use('/api', userRouter);
+app.use('/api', router);
 
 //endpoint
 app.get('/', (_req: Request, res: Response) => {

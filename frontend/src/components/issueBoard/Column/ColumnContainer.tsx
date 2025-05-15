@@ -52,8 +52,6 @@ const ColumnContainer: React.FC<ColumnContainerProps> = ({
         data: {type: 'column'},
     });
 
-    const isEmpty = tasks.length === 0;
-
     const columnStyle: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,

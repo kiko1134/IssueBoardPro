@@ -27,7 +27,7 @@ export default class UserController {
             const user = await User.findByPk(req.params.id, { /*…*/});
             if (!user) {
                 res.status(404).json({message: 'User not found'});
-                return;                 // you can `return;` to stop execution
+                return;
             }
             res.json(user);
         } catch (err) {

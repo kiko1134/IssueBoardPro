@@ -1,9 +1,9 @@
 import {Avatar, Button, Dropdown, Form, Input, MenuProps, message, Modal, Popconfirm} from "antd";
-import {DownOutlined, PlusOutlined,LogoutOutlined} from "@ant-design/icons";
+import {DownOutlined, LogoutOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {createProject, fetchProjects, Project} from "../../api/services/projectService";
 import {jwtDecode} from "jwt-decode";
-import { AVATAR_COLORS } from "../issueBoard/IssueBoardFilterActions";
+import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
 
 interface HeaderContentProps {
     onProjectSelect: (projectId: string, projectName: string) => void;
@@ -80,17 +80,14 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
             {
                 key: 'user-info',
                 label: (
-                    <div style={{ padding: '8px 12px', pointerEvents: 'none' }}>
-                        <div style={{ fontWeight: 'bold' }}>{username}</div>
-                        <div style={{ fontSize: '12px', color: '#888' }}>{email}</div>
+                    <div style={{padding: '8px 12px', pointerEvents: 'none'}}>
+                        <div style={{fontWeight: 'bold'}}>{username}</div>
+                        <div style={{fontSize: '12px', color: '#888'}}>{email}</div>
                     </div>
                 ),
             },
-            // { type: 'divider' },
-            // { key: 'profile', label: 'My Profile', icon: <UserOutlined /> },
-            // { key: 'settings', label: 'Settings', icon: <SettingOutlined /> },
-            { type: 'divider' },
-            { key: 'logout', label: 'Logout', icon: <LogoutOutlined /> },
+            {type: 'divider'},
+            {key: 'logout', label: 'Logout', icon: <LogoutOutlined/>},
         ],
         onClick: handleMenuClick,
     };
@@ -151,13 +148,21 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
                     cancelText="No"
                     open={true}
                 >
-                    <Avatar style={{ marginLeft: 'auto', backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length], cursor: 'pointer' }}>
+                    <Avatar style={{
+                        marginLeft: 'auto',
+                        backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length],
+                        cursor: 'pointer'
+                    }}>
                         {firstLetter}
                     </Avatar>
                 </Popconfirm>
             ) : (
                 <Dropdown menu={profileMenuProps} trigger={['click']}>
-                    <Avatar style={{ marginLeft: 'auto', backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length], cursor: 'pointer' }}>
+                    <Avatar style={{
+                        marginLeft: 'auto',
+                        backgroundColor: AVATAR_COLORS[id % AVATAR_COLORS.length],
+                        cursor: 'pointer'
+                    }}>
                         {firstLetter}
                     </Avatar>
                 </Dropdown>

@@ -69,28 +69,9 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
             onSave(updated);
             onClose();
         } catch (error) {
-            console.error(error);
             message.error("Failed to update ticket");
         }
     };
-
-    // const handleAddWorkLog = async () => {
-    //     const added = newHours * 60 + newMinutes;
-    //     const newTotal = workLogMinutes + added;
-    //
-    //     console.log("issue", issue);
-    //
-    //     try {
-    //         const updated = await updateTaskWorkLog(issue.id, newTotal);
-    //         setWorkLogMinutes(updated.workLog);
-    //         setNewHours(0);
-    //         setNewMinutes(0);
-    //         message.success("Worklog updated");
-    //     } catch (err) {
-    //         console.error(err);
-    //         message.error("Failed to update worklog");
-    //     }
-    // };
 
     const handleAddWorkLog = async () => {
         const added = newHours * 60 + newMinutes;

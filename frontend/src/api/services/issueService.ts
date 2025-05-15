@@ -64,25 +64,19 @@ export const deleteTask = async (id: number): Promise<void> => {
     await http.delete(`/issues/${id}`);
 }
 
-// export const logWork = async (issueId: number, minutes: number) => {
-//     const {data} = await http
-//         .post<{ totalMinutes: number }>(`/issues/${issueId}/worklog`, {minutes})
-//     return data;
-// };
-
 export const logWork = async (
     issueId: number,
     userId: number,
     minutes: number
 ): Promise<LogWorkResponse> => {
-    const { data } = await http.post<LogWorkResponse>(
+    const {data} = await http.post<LogWorkResponse>(
         `/issues/${issueId}/worklog`,
-        { userId, minutes }
+        {userId, minutes}
     );
     return data;
 };
 
-export const fetchProjectWorklogs = async(projectId: number) =>{
+export const fetchProjectWorklogs = async (projectId: number) => {
     const {data} = await http.get<UserWorklog[]>(`/projects/${projectId}/worklogs`);
     return data;
 };
@@ -90,6 +84,6 @@ export const fetchProjectWorklogs = async(projectId: number) =>{
 export const fetchTaskWorklog = async (
     issueId: number
 ): Promise<LogWorkResponse> => {
-    const { data } = await http.get<LogWorkResponse>(`/issues/${issueId}/worklog`);
+    const {data} = await http.get<LogWorkResponse>(`/issues/${issueId}/worklog`);
     return data;
 };

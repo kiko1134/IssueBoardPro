@@ -36,7 +36,6 @@ const SiderContent: React.FC<SiderContentProps> = ({projectName, icon, collapsed
                 )}
             </div>
 
-            {/* Menu */}
             <Menu
                 theme="dark"
                 mode="inline"

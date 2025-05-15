@@ -27,7 +27,6 @@ export const createProject = async (
 export const fetchProjectMembers = (projectId: number) =>
     http.get(`/projects/${projectId}/members`).then((res) => res.data);
 
-export const fetchUsers = () => http.get("/users").then((res) => res.data);
 
 export const addProjectMember = (
     projectId: number,

@@ -82,7 +82,6 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                 placeholder="Search"
                 style={{
                     width: 200,
-                    // marginRight: '16px'
                 }}
                 value={searchText}
                 onChange={(e) => onSearchChange(e.target.value)}

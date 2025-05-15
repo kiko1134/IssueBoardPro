@@ -90,30 +90,6 @@ export default class IssueController {
         }
     };
 
-    /** PATCH /api/issues/:id/worklog — update only the workLog field */
-  static updateWorkLog: RequestHandler = async (req, res, next) => {
-    try {
-      const issue = await Issue.findByPk(req.params.id);
-      if (!issue) {
-        res.status(404).json({ message: 'Issue not found' });
-      }
-
-      const { workLog } = req.body;
-      if (typeof workLog !== 'number') {
-        res
-          .status(400)
-          .json({ message: 'Invalid workLog value (must be a number)' });
-      }
-
-      issue.workLog = workLog;
-      await issue.save();
-
-      res.json(issue);
-    } catch (err) {
-      next(err);
-    }
-  };
-
     /** DELETE /api/issues/:id — delete an issue */
     static destroy: RequestHandler = async (req, res, next) => {
         try {

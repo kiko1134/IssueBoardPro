@@ -77,7 +77,6 @@ export default class ColumnController {
     };
 
     static reorder: RequestHandler = async (req, res, next) => {
-        // Expect body: Array<{ id: number; position: number }>
         const updates: { id: number; position: number }[] = req.body;
         const t = await sequelize.transaction();
         try {

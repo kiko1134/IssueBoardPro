@@ -14,7 +14,6 @@ export default class ProjectController {
                 return;
             }
 
-            // Fetch projects via the belongsToMany association
             const projects = await user.getAssignedProjects({
                 order: [['name', 'ASC']],
             });
