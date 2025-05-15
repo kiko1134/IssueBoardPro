@@ -22,6 +22,12 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
             onDelete: 'CASCADE',
         },
 
+        position: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+            defaultValue: 0,
+        },
+
         createdAt: {
             allowNull: false,
             type: DataTypes.DATE,

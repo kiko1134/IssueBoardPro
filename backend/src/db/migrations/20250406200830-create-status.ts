@@ -14,6 +14,12 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
       unique: true,
     },
   });
+
+  await queryInterface.bulkInsert('Status', [
+    { id: 1, name: 'To Do' },
+    { id: 2, name: 'In Progress' },
+    { id: 3, name: 'Done' },
+  ]);
 }
 
 export async function down(queryInterface: QueryInterface): Promise<void> {
