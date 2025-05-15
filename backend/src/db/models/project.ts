@@ -28,7 +28,7 @@ export class Project
                     primaryKey: true,
                 },
                 name: {
-                    type: DataTypes.STRING(40),
+                    type: DataTypes.STRING(255),
                     allowNull: false,
                 },
                 description: {

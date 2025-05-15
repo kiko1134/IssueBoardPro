@@ -1,33 +1,31 @@
 import { QueryInterface, DataTypes, literal } from 'sequelize';
 
 export async function up(queryInterface: QueryInterface): Promise<void> {
-    await queryInterface.createTable('Columns', {
+    await queryInterface.createTable('WorkLogs', {
         id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
+            type: DataTypes.INTEGER.UNSIGNED,
             autoIncrement: true,
+            primaryKey: true,
             allowNull: false,
         },
-
-        name: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-        },
-
-        projectId: {
+        issueId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: 'Projects', key: 'id' },
-            onUpdate: 'CASCADE',
+            references: { model: 'Issues', key: 'id' },
             onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
         },
-
-        position: {
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'Users', key: 'id' },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+        },
+        minutes: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
-            defaultValue: 0,
         },
-
         createdAt: {
             allowNull: false,
             type: DataTypes.DATE,
@@ -42,5 +40,5 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
 }
 
 export async function down(queryInterface: QueryInterface): Promise<void> {
-    await queryInterface.dropTable('Columns');
+    await queryInterface.dropTable('WorkLogs');
 }

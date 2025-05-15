@@ -71,6 +71,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({onRegisterSuccess, onSwitchT
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item name="name" label="Username" rules={[
                         {required: true},
+                        /* eslint-disable-next-line no-control-regex */
                         { pattern: /^[\x00-\x7F]+$/, message: 'Username must contain only English characters' }
                     ]}>
                         <Input placeholder="Enter your username" size="large" style={{borderRadius: 4}}/>
@@ -78,6 +79,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({onRegisterSuccess, onSwitchT
 
                     <Form.Item name="email" label="Email" rules={[
                         {required: true, type: 'email'},
+                        /* eslint-disable-next-line no-control-regex */
                         { pattern: /^[\x00-\x7F]+$/, message: 'Email must contain only English characters' }
                     ]}>
                         <Input placeholder="Enter your email" size="large" style={{borderRadius: 4}}/>
@@ -85,6 +87,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({onRegisterSuccess, onSwitchT
 
                     <Form.Item name="password" label="Password" rules={[
                         {required: true, min: 6},
+                        /* eslint-disable-next-line no-control-regex */
                         { pattern: /^[\x00-\x7F]+$/, message: 'Password must contain only English characters' }
                     ]}>
                         <Input.Password placeholder="Enter your password" size="large" style={{borderRadius: 4}}/>

@@ -9,7 +9,7 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
       allowNull: false,
     },
     name: {
-      type: DataTypes.STRING(40),
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     description: {

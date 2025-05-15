@@ -52,7 +52,7 @@ export class Issue
                     primaryKey: true,
                 },
                 title: {
-                    type: DataTypes.STRING(20),
+                    type: DataTypes.STRING(255),
                     allowNull: false,
                 },
                 description: {
@@ -96,10 +96,6 @@ export class Issue
                 type: {
                     type: DataTypes.ENUM('Bug', 'Feature', 'Task'),
                     allowNull: false,
-                },
-                workLog: {
-                    type: DataTypes.INTEGER.UNSIGNED,
-                    allowNull: true,
                 },
             },
             {

@@ -8,6 +8,7 @@ import {Project} from "./project";
 import {Sequelize} from "sequelize";
 import {UserProjects} from "./userprojects";
 import {Column} from "./column";
+import {WorkLog} from "./worklog";
 
 const env = process.env.NODE_ENV || 'development';
 const config = (configJson as any)[env];
@@ -23,6 +24,7 @@ Status.initialize(sequelize);
 Project.initialize(sequelize);
 UserProjects.initialize(sequelize);
 Column.initialize(sequelize);
+WorkLog.initialize(sequelize);
 
 const db: any = {
     sequelize,
@@ -34,6 +36,7 @@ const db: any = {
     Project,
     UserProjects,
     Column,
+    WorkLog
 };
 
 Object.values(db)

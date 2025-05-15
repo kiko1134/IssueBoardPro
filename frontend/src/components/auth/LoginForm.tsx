@@ -50,6 +50,7 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item name="email" label="Email" rules={[
                         {required: true, type: 'email'},
+                        /* eslint-disable-next-line no-control-regex */
                         {pattern: /^[\x00-\x7F]+$/, message: 'Email must contain only English characters' }
                         ]}>
                         <Input placeholder="Enter your email"/>
@@ -57,6 +58,7 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister
 
                     <Form.Item name="password" label="Password" rules={[
                         {required: true, min: 6},
+                        /* eslint-disable-next-line no-control-regex */
                         { pattern: /^[\x00-\x7F]+$/, message: 'Password must contain only English characters' }
                     ]}>
                         <Input.Password placeholder="Enter your password"/>

@@ -35,8 +35,6 @@ import {
   updateTask,
 } from "../../api/services/issueService";
 
-import WorklogSection from "../worklog/WorklogSection";
-
 interface IssueBoardContentPageProps {
   projectId: number;
   searchText: string;
@@ -52,8 +50,6 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
   priorityFilter,
   userFilters,
 }) => {
-
-  const [reloadKey, setReloadKey] = useState(0);
 
   const [columns, setColumns] = useState<ColumnModel[]>([]);
   const [tasks, setTasks] = useState<TaskModel[]>([]);
@@ -205,7 +201,6 @@ const IssueBoardContentPage: React.FC<IssueBoardContentPageProps> = ({
 
   const handleSave = (updated: TaskModel) => {
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
-    setReloadKey((k) => k + 1);
     closeModal();
   };
 

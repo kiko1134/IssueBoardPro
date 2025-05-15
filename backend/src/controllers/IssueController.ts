@@ -37,7 +37,7 @@ export default class IssueController {
         const {
             title, description, statusId, projectId,
             assignedTo, assignedBy, dueDate,
-            priority, type, workLog, columnId,
+            priority, type, columnId,
         } = req.body;
 
 
@@ -50,7 +50,7 @@ export default class IssueController {
             const issue = await Issue.create({
                 title, description, statusId, projectId,
                 assignedTo, assignedBy, dueDate,
-                priority, type, workLog, columnId,
+                priority, type, columnId,
             });
             res.status(201).json(issue);
         } catch (err) {
@@ -72,7 +72,6 @@ export default class IssueController {
                 columnId,
                 assignedTo,
                 assignedBy,
-                workLog,
             } = req.body;
 
   
@@ -83,9 +82,6 @@ export default class IssueController {
             issue.columnId = columnId ?? issue.columnId;
             issue.assignedTo = assignedTo ?? issue.assignedTo;
             issue.assignedBy = assignedBy ?? issue.assignedBy;
-            if (workLog !== undefined) {  
-                issue.workLog = workLog;
-            }
 
             await issue.save();
             res.json(issue);

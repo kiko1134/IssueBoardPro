@@ -31,7 +31,7 @@ export class Column
                     primaryKey: true,
                 },
                 name: {
-                    type: DataTypes.STRING(40),
+                    type: DataTypes.STRING(100),
                     allowNull: false,
                 },
                 projectId: {

@@ -3,13 +3,13 @@ import { QueryInterface, DataTypes, literal } from 'sequelize';
 export async function up(queryInterface: QueryInterface): Promise<void> {
     await queryInterface.createTable('Issues', {
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             autoIncrement: true,
             allowNull: false,
         },
         title: {
-            type: DataTypes.STRING(20),
+            type: DataTypes.STRING(255),
             allowNull: false,
         },
         description: {
@@ -56,10 +56,6 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
         type: {
             type: DataTypes.ENUM('Bug', 'Feature', 'Task'),
             allowNull: false,
-        },
-        workLog: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
         },
         columnId: {
             type: DataTypes.INTEGER,
