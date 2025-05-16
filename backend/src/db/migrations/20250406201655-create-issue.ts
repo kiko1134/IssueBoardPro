@@ -31,14 +31,14 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
             onDelete: 'CASCADE',
         },
         assignedTo: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             allowNull: true,
             references: { model: 'Users', key: 'id' },
             onUpdate: 'CASCADE',
             onDelete: 'SET NULL',
         },
         assignedBy: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             allowNull: true,
             references: { model: 'Users', key: 'id' },
             onUpdate: 'CASCADE',

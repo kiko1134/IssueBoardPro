@@ -2,7 +2,6 @@ import process from 'process';
 import configJson from '../config/config.json';
 import {User} from "./user";
 import {Issue} from "./issue";
-import {Note} from "./note";
 import {Status} from "./status";
 import {Project} from "./project";
 import {Sequelize} from "sequelize";
@@ -19,7 +18,6 @@ const sequelize = config.use_env_variable
 
 User.initialize(sequelize);
 Issue.initialize(sequelize);
-Note.initialize(sequelize);
 Status.initialize(sequelize);
 Project.initialize(sequelize);
 UserProjects.initialize(sequelize);
@@ -31,7 +29,6 @@ const db: any = {
     Sequelize,
     User,
     Issue,
-    Note,
     Status,
     Project,
     UserProjects,

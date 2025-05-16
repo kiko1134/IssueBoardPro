@@ -22,7 +22,6 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     public static associate(models: any) {
         User.hasMany(models.Issue, {foreignKey: 'assignedTo', as: 'AssignedIssues'});
         User.hasMany(models.Issue, {foreignKey: 'assignedBy', as: 'ReportedIssues'});
-        User.hasMany(models.Note, {foreignKey: 'userId'});
         User.belongsToMany(models.Project, {
             through: models.UserProjects,
             foreignKey: 'userId',

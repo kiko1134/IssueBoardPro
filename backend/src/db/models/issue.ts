@@ -110,6 +110,5 @@ export class Issue
         Issue.belongsTo(models.Status, {foreignKey: 'statusId'});
         Issue.belongsTo(models.User, {foreignKey: 'assignedTo', as: 'Assignee'});
         Issue.belongsTo(models.User, {foreignKey: 'assignedBy', as: 'Reporter'});
-        Issue.hasMany(models.Note, {foreignKey: 'issueId'});
     }
 }

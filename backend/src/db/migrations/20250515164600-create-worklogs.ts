@@ -9,14 +9,14 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
             allowNull: false,
         },
         issueId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
             references: { model: 'Issues', key: 'id' },
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
         },
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
             references: { model: 'Users', key: 'id' },
             onDelete: 'CASCADE',

@@ -3,7 +3,7 @@ import { QueryInterface, DataTypes } from 'sequelize';
 export async function up(queryInterface: QueryInterface): Promise<void> {
     await queryInterface.createTable('UserProjects', {
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
             references: { model: 'Users', key: 'id' },
             onDelete: 'CASCADE',
