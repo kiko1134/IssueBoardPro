@@ -31,7 +31,7 @@ export default class WorklogController {
     };
 
 
-//  POST /api/issues/:id/worklog
+//  POST /api/issues/:id/worklog - add worklog to issue
     static logWork: RequestHandler = async (req, res, next) => {
         try {
             const issueId = Number(req.params.id);

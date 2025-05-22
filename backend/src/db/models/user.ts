@@ -28,6 +28,10 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
             otherKey: 'projectId',
             as: 'AssignedProjects'
         });
+        User.hasMany(models.Project, {
+            as: 'OwnedProjects',
+            foreignKey: 'adminId',
+        });
     }
 
     public static initialize(sequelize: Sequelize) {

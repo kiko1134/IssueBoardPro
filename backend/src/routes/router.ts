@@ -23,6 +23,10 @@ router.get("/projects/:id/members", ProjectController.members);
 router.post("/projects/:id/members", ProjectController.addMember);
 router.get("/projects/:projectId/worklogs", WorklogController.projectWorklogSummary);
 router.get("/projects/:projectId/users/:userId/worklogs", WorklogController.listUserWorklogs);
+router.delete('/projects/:id/users/:userId', ProjectController.removeUser);
+router.put('/projects/:id', ProjectController.update);
+router.delete('/projects/:id', ProjectController.destroy)
+router.get('/projects/:id', ProjectController.show);
 
 router.get('/issues', IssueController.index);
 router.get('/issues/:id', IssueController.show);

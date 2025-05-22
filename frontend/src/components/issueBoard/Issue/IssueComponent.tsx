@@ -1,7 +1,7 @@
 import React from "react";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
-import {Card, Popconfirm, Space, Typography} from "antd";
+import {Card, Popconfirm, Space, Tooltip, Typography} from "antd";
 import {DeleteOutlined, MenuOutlined} from "@ant-design/icons"
 import {Task} from "../../../api/services/issueService";
 
@@ -45,7 +45,7 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick, onDelete
                     <Typography.Text strong style={{margin: 0}}>
                         {issue.title}
                     </Typography.Text>
-                    
+
                     <Space size="small">
                         <Popconfirm
                             title="Delete this task?"
@@ -67,16 +67,17 @@ const IssueComponent: React.FC<IssueComponentProps> = ({issue, onClick, onDelete
                             />
                                 </span>
                         </Popconfirm>
-
-                        <MenuOutlined
-                            {...attributes}
-                            {...listeners}
-                            style={{cursor: 'grab', fontSize: 16, color: '#999'}}
-                            onClick={e => e.stopPropagation()}
-                        />
+                        <Tooltip title="Drag to reorder">
+                            <MenuOutlined
+                                {...attributes}
+                                {...listeners}
+                                style={{cursor: 'grab', fontSize: 16, color: '#999'}}
+                                onClick={e => e.stopPropagation()}
+                            />
+                        </Tooltip>
                     </Space>
                 </div>
-                
+
                 {issue.description && (
                     <Typography.Paragraph style={{margin: 0, whiteSpace: 'pre-wrap'}}>
                         {issue.description}

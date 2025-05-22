@@ -60,7 +60,6 @@ const IssueTrackerLayout: React.FC<IssueTrackerLayoutProps> = ({onLogout}) => {
                         {activeMenuKey === 'members' ? (
                             <MembersPage projectId={projectIdNum}/>
                         ) : activeMenuKey === 'worklog' ? (
-                            // Важно: подаваме projectId и тук
                             <WorklogSection projectId={projectIdNum}/>
                         ) : (
                             <IssueBoardIndexPage projectId={projectIdNum}/>

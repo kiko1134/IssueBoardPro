@@ -16,6 +16,13 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    adminId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: { model: 'Users', key: 'id' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

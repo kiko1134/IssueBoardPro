@@ -4,6 +4,7 @@ interface ProjectAttributes {
     id: number;
     name: string;
     description?: string;
+    adminId: number;
 }
 
 interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> {
@@ -15,6 +16,7 @@ export class Project
     public id!: number;
     public name!: string;
     public description?: string;
+    public adminId!: number;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
@@ -35,6 +37,10 @@ export class Project
                     type: DataTypes.TEXT,
                     allowNull: true,
                 },
+                adminId: {
+                    type: DataTypes.INTEGER.UNSIGNED,
+                    allowNull: false,
+                },
             },
             {
                 tableName: 'Projects',
@@ -50,6 +56,10 @@ export class Project
             foreignKey: 'projectId',
             otherKey: 'userId',
             as: 'AssignedUsers'
+        });
+        Project.belongsTo(models.User, {
+            as: 'admin',
+            foreignKey: 'adminId',
         });
     }
 }
