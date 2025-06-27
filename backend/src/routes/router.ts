@@ -5,6 +5,7 @@ import {authenticateJWT} from "../middleware/authMiddleware";
 import IssueController from "../controllers/IssueController";
 import ColumnController from "../controllers/ColumnController";
 import WorklogController from "../controllers/WorklogController";
+import {User} from "../db/models/user";
 
 const router = Router();
 
@@ -44,6 +45,9 @@ router.get('/columns/:projectId', ColumnController.show);
 router.post('/columns', ColumnController.store);
 router.put('/columns/:id', ColumnController.update);
 router.delete('/columns/:id', ColumnController.destroy);
+
+router.get('/auth/me', UserController.me);
+router.post('/auth/logout', UserController.logout);
 
 
 export default router;

@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Button, Card, Form, Input, message, Typography} from 'antd';
 import {login} from "../../api/services/userService";
+import {UserContext} from "../context/UserContext";
 
 const {Title} = Typography;
 
@@ -11,13 +12,14 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister}) => {
     const [loading, setLoading] = useState(false);
+    const { refreshUser } = useContext(UserContext);
 
     const onFinish = async (values: { email: string, password: string }) => {
 
         setLoading(true);
         try {
-            const {token, username} = await login(values);
-            localStorage.setItem('token', token);
+            const {username} = await login(values);
+            await refreshUser(); //зареждаме текущия потребител
             message.success('Welcome back, ' + username);
             onLoginSuccess();
         } catch (error: any) {

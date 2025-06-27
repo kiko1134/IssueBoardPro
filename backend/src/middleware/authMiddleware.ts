@@ -21,22 +21,20 @@ export function authenticateJWT(
     res: Response,
     next: NextFunction
 ): void {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({ message: 'Missing or invalid Authorization header' });
+    const token = req.cookies?.access_token;
+    console.log("authenticateJWT",token);
+    if (!token) {
+        res.status(401).json({ message: 'Missing authentication token' });
         return;
     }
-
-    const token = authHeader.slice(7); // remove 'Bearer '
 
     try {
         req.user = jwt.verify(
             token,
-            process.env.JWT_SECRET || 'default-secret'
+            process.env.JWT_SECRET!,
         ) as JwtPayload;
         next();
     } catch (err) {
         res.status(401).json({ message: 'Invalid or expired token' });
-        return;
     }
 }

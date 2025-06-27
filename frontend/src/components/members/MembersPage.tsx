@@ -8,34 +8,19 @@ import {
 } from "../../api/services/projectService";
 import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
 import {User} from "../../api/services/userService";
-import {jwtDecode} from "jwt-decode";
+import {UserContext} from "../context/UserContext";
 
 interface MembersPageProps {
     projectId: number;
 }
 
-interface DecodedToken {
-    id: number;
-    username: string;
-    email: string;
-}
 
 const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
     const [members, setMembers] = useState<any[]>([]);
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
     const [isAdmin, setIsAdmin] = useState(false);
 
-    const [currentUserId] = useState<number>(() => {
-        const token = localStorage.getItem('token');
-        if (!token) return 0;
-        try {
-            const decoded = jwtDecode<DecodedToken>(token);
-            return decoded.id;
-        } catch {
-            console.warn('Invalid token');
-            return 0;
-        }
-    });
+    const {user} = React.useContext(UserContext);
 
     useEffect(() => {
         fetchProjectMembers(projectId)
@@ -44,10 +29,10 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
 
         fetchProjectDetails(projectId)
             .then((proj) => {
-                setIsAdmin(proj.adminId === currentUserId);
+                setIsAdmin(proj.adminId === user?.id);
             })
             .catch(() => message.error('Failed to load project info'));
-    }, [projectId,currentUserId]);
+    }, [projectId, user?.id]);
 
     const handleAdd = () => {
         addProjectMember(projectId, {email: newMemberEmail})
@@ -76,17 +61,17 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
             <List<User>
                 itemLayout="horizontal"
                 dataSource={members}
-                renderItem={(user) => {
-                    const color = AVATAR_COLORS[user.id % AVATAR_COLORS.length];
+                renderItem={(c_user) => {
+                    const color = AVATAR_COLORS[c_user.id % AVATAR_COLORS.length];
                     return (
                         <List.Item
                             actions={
-                                isAdmin && user.id !== currentUserId
+                                isAdmin && c_user.id !== user?.id
                                     ? [
                                         <Popconfirm
                                             title="Delete this user?"
                                             onConfirm={(e) => {
-                                                handleRemove(user.id);
+                                                handleRemove(c_user.id);
                                             }}
                                             okText="Yes"
                                             cancelText="No"
@@ -109,11 +94,11 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
                             <List.Item.Meta
                                 avatar={
                                     <Avatar style={{backgroundColor: color, verticalAlign: 'middle'}}>
-                                        {user.username.charAt(0).toUpperCase()}
+                                        {c_user.username.charAt(0).toUpperCase()}
                                     </Avatar>
                                 }
-                                title={<Typography.Text strong>{user.username}</Typography.Text>}
-                                description={<Typography.Text type="secondary">{user.email}</Typography.Text>}
+                                title={<Typography.Text strong>{c_user.username}</Typography.Text>}
+                                description={<Typography.Text type="secondary">{c_user.email}</Typography.Text>}
                             />
                         </List.Item>
                     );

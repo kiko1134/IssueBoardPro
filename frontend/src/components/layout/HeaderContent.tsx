@@ -1,6 +1,6 @@
 import {Avatar, Button, Dropdown, Form, Input, MenuProps, message, Modal, Popconfirm, Tooltip, Typography} from "antd";
 import {DeleteOutlined, DownOutlined, EditOutlined, LogoutOutlined, PlusOutlined} from "@ant-design/icons";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {
     createProject,
     deleteProject,
@@ -8,8 +8,8 @@ import {
     ProjectDetails,
     updateProject
 } from "../../api/services/projectService";
-import {jwtDecode} from "jwt-decode";
 import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
+import {UserContext} from "../context/UserContext";
 
 interface HeaderContentProps {
     onProjectSelect: (projectId: string, projectName: string) => void;
@@ -19,6 +19,12 @@ interface HeaderContentProps {
 
 const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}) => {
 
+    const { user } = useContext(UserContext);
+    const username = user?.username ?? 'User';
+    const email = user?.email ?? 'user@example.com';
+    const id = Number(user?.id) || 0;
+    const firstLetter = username.charAt(0).toUpperCase();
+
     const [projects, setProjects] = useState<ProjectDetails[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -27,24 +33,24 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
     const [form] = Form.useForm();
     const [profileOpen, setProfileOpen] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-    let username = 'User';
-    let email = 'user@example.com';
-    let id = 0;
-
-    const token = localStorage.getItem('token');
-    if (token) {
-        try {
-            const decoded = jwtDecode<any>(token);
-            if (decoded.username) username = decoded.username;
-            if (decoded.email) email = decoded.email;
-            if (decoded.id) id = decoded.id;
-        } catch (err) {
-            console.warn('Invalid token');
-        }
-    }
-
-    const firstLetter = username.charAt(0).toUpperCase();
+    //
+    // let username = 'User';
+    // let email = 'user@example.com';
+    // let id = 0;
+    //
+    // const token = localStorage.getItem('token');
+    // if (token) {
+    //     try {
+    //         const decoded = jwtDecode<any>(token);
+    //         if (decoded.username) username = decoded.username;
+    //         if (decoded.email) email = decoded.email;
+    //         if (decoded.id) id = decoded.id;
+    //     } catch (err) {
+    //         console.warn('Invalid token');
+    //     }
+    // }
+    //
+    // const firstLetter = username.charAt(0).toUpperCase();
 
 
     useEffect(() => {

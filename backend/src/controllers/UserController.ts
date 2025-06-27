@@ -86,11 +86,19 @@ export default class UserController {
 
             const token = jwt.sign(
                 {id: user.id, username: user.username, email: user.email},
-                process.env.JWT_SECRET || 'default-secret',
+                process.env.JWT_SECRET!,
                 {expiresIn: '15m'}
             );
 
-            res.json({token, username: user.username, email: user.email, id: user.id});
+            res
+                .cookie('access_token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 15 * 60 * 1000,
+                })
+                .status(200)
+                .json({token, username: user.username, email: user.email, id: user.id});
         } catch (error) {
             next(error);
         }
@@ -111,5 +119,37 @@ export default class UserController {
         } catch (error) {
             next(error);
         }
+    };
+
+    static me: RequestHandler = async (req, res, next) => {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        try {
+            const user = await User.findByPk(userId, {
+                attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+            });
+            if (!user) {
+                res.status(404).json({message: 'User not found'});
+                return;
+            }
+            res.json(user);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static logout: RequestHandler = (req, res) => {
+        res
+            .clearCookie('access_token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+            })
+            .status(200)
+            .json({message: 'Logged out successfully'});
     };
 }
