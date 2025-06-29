@@ -1,5 +1,4 @@
-// src/context/UserContext.tsx
-import React, {createContext, ReactNode, useCallback, useState} from 'react';
+import React, {createContext, ReactNode, useCallback, useEffect, useState} from 'react';
 import {http} from '../../api/http';
 
 export interface User {
@@ -26,7 +25,6 @@ interface UserProviderProps {
 const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
 
-    // Викаме го след login, за да заредим текущия user
     const refreshUser = useCallback(async () => {
         try {
             const {data} = await http.get<User>('/auth/me');
@@ -34,6 +32,19 @@ const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         } catch {
             setUser(null);
         }
+    }, []);
+
+    useEffect(() => {
+        const id = http.interceptors.response.use(
+            r => r,
+            err => {
+                if (err.response?.status === 401) {
+                    setUser(null);
+                }
+                return Promise.reject(err);
+            }
+        );
+        return () => { http.interceptors.response.eject(id); };
     }, []);
 
     return (

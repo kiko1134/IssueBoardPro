@@ -39,9 +39,23 @@ export interface LogWorkResponse {
     totalMinutes: number;
 }
 
+export interface TaskFilters {
+    searchText?: string;
+    type?: string;
+    priority?: string;
+    userIds?: number[];
+}
 
-export const fetchTasks = async (projectId: number): Promise<Task[]> => {
-    const {data} = await http.get<Task[]>(`/issues?id=${projectId}`);
+export const fetchTasks = async (
+    projectId: number,
+    filters: TaskFilters = {}
+): Promise<Task[]> => {
+    const params: Record<string, any> = {projectId};
+    if (filters.searchText) params.search = filters.searchText;
+    if (filters.type) params.type = filters.type;
+    if (filters.priority) params.priority = filters.priority;
+    if (filters.userIds && filters.userIds.length) params.assignedTo = filters.userIds;
+    const {data} = await http.get<Task[]>('/issues', {params});
     return data;
 };
 

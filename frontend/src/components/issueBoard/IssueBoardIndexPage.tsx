@@ -2,8 +2,6 @@ import React from "react";
 import IssueBoardFilterActions from "./IssueBoardFilterActions";
 import IssueBoardContentPage from "./IssueBoardContentPage";
 
-;
-
 interface IssueBoardIndexPageProps {
     projectId: number;
 }

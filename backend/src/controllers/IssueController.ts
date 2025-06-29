@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import db from '../db/models';
+import {Op} from "sequelize";
 
 const { Issue } = db;
 
@@ -8,9 +9,35 @@ export default class IssueController {
     static index: RequestHandler = async (req, res, next) => {
         try {
             const where: any = {};
+
             if (req.query.projectId) {
                 where.projectId = Number(req.query.projectId);
             }
+
+            if (req.query.search) {
+                const search = String(req.query.search).trim();
+                where[Op.or] = [
+                    { title:  { [Op.like]: `%${search}%` } },
+                    { description: { [Op.like]: `%${search}%` } },
+                ];
+            }
+
+            if (req.query.type) {
+                where.type = String(req.query.type);
+            }
+
+            if (req.query.priority) {
+                where.priority = String(req.query.priority);
+            }
+
+            if (req.query.assignedTo) {
+                const raw = req.query.assignedTo;
+                const list = Array.isArray(raw)
+                    ? raw.map(x => Number(x))
+                    : String(raw).split(',').map(x => Number(x));
+                where.assignedTo = { [Op.in]: list };
+            }
+
             const issues = await Issue.findAll({ where });
             res.json(issues);
         } catch (err) {

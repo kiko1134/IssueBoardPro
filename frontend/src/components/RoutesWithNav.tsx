@@ -12,13 +12,18 @@ const RoutesWithNav: React.FC = () => {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
-    // При първоначално зареждане – само веднъж – опитваме refreshUser.
+
     useEffect(() => {
         refreshUser()
-            .catch(() => {
-            })
             .finally(() => setLoading(false));
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [refreshUser]);
+
+    useEffect(() => {
+        if (!loading && user === null) {
+            message.error('Session expired. Please log in again.');
+            navigate('/login', { replace: true });
+        }
+    }, [user, loading, navigate]);
 
 
     const handleLogout = async () => {
@@ -35,7 +40,7 @@ const RoutesWithNav: React.FC = () => {
     if (loading) {
         return (
             <div style={{display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center'}}>
-                <Spin tip="Loading session..." size="large"/>
+                <Spin size="large"/>
             </div>
         );
     }

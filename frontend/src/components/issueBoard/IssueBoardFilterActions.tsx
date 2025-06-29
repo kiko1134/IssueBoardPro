@@ -45,29 +45,41 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                                                                          }) => {
 
     const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(false);
-    const isMounted = useRef(true);
+    const [loadingUsers, setLoadingUsers] = useState(false);
+    const debounceRef = useRef<number | undefined>(undefined);
+    const [searchInput, setSearchInput] = useState(searchText);
 
+    // зареждаме потребителите веднъж
     useEffect(() => {
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
-
-    useEffect(() => {
-        isMounted.current = true;
-        setLoading(true);
+        let canceled = false;
+        setLoadingUsers(true);
         fetchProjectMembers(projectId)
-            .then((data) => {
-                if (isMounted.current) setUsers(data);
-            })
-            .catch(() => {
-                if (isMounted.current) message.error('Failed to load users');
-            })
-            .finally(() => {
-                if (isMounted.current) setLoading(false);
-            });
+            .then((data) => !canceled && setUsers(data))
+            .catch(() => !canceled && message.error("Failed to load users"))
+            .finally(() => !canceled && setLoadingUsers(false));
+        return () => {
+            canceled = true;
+        };
     }, [projectId]);
+
+    // Дебаунс и min 3 chars
+    useEffect(() => {
+        if (debounceRef.current !== undefined) {
+            window.clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = window.setTimeout(() => {
+            if (searchInput === "" || searchInput.length >= 3) {
+                onSearchChange(searchInput);
+            }
+        }, 400);
+
+        return () => {
+            if (debounceRef.current !== undefined) {
+                window.clearTimeout(debounceRef.current);
+            }
+        };
+    }, [searchInput, onSearchChange]);
 
     return (
         <div style={{
@@ -83,13 +95,13 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                 style={{
                     width: 200,
                 }}
-                value={searchText}
-                onChange={(e) => onSearchChange(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
             />
 
             {
-                loading ? (
-                    <Spin spinning={loading} size="small"/>
+                loadingUsers ? (
+                    <Spin spinning={loadingUsers} size="small"/>
                 ) : (
                     <div style={{display: "flex", alignItems: "center", gap: 4}}>
                         {users.map((user) => {
