@@ -30,7 +30,7 @@ const SiderContent: React.FC<SiderContentProps> = ({projectName, icon, collapsed
                 {collapsed ? (
                     <div style={{fontSize: 24, color: "white"}}>{icon}</div>
                 ) : (
-                    <Title level={4} style={{color: "white", margin: 0}}>
+                    <Title level={4} style={{color: "white", margin: 0}} ellipsis = {{tooltip: true}}>
                         {projectName}
                     </Title>
                 )}

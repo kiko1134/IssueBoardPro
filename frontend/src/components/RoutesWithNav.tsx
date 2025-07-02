@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
+import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {message, Spin} from 'antd';
 import {UserContext} from "./context/UserContext";
 import http from "../api/http";
@@ -10,6 +10,7 @@ import IssueTrackerLayout from "./layout/IssueTrackerLayout";
 const RoutesWithNav: React.FC = () => {
     const {user, refreshUser} = useContext(UserContext);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [loading, setLoading] = useState(true);
 
@@ -19,11 +20,14 @@ const RoutesWithNav: React.FC = () => {
     }, [refreshUser]);
 
     useEffect(() => {
-        if (!loading && user === null) {
+        if (!loading &&
+            user === null &&
+            location.pathname !== '/login' &&
+            location.pathname !== '/register') {
             message.error('Session expired. Please log in again.');
-            navigate('/login', { replace: true });
+            navigate('/login', {replace: true});
         }
-    }, [user, loading, navigate]);
+    }, [user, loading, navigate, location.pathname]);
 
 
     const handleLogout = async () => {

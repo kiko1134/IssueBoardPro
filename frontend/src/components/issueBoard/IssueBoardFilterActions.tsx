@@ -49,7 +49,6 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
     const debounceRef = useRef<number | undefined>(undefined);
     const [searchInput, setSearchInput] = useState(searchText);
 
-    // зареждаме потребителите веднъж
     useEffect(() => {
         let canceled = false;
         setLoadingUsers(true);
@@ -62,7 +61,6 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
         };
     }, [projectId]);
 
-    // Дебаунс и min 3 chars
     useEffect(() => {
         if (debounceRef.current !== undefined) {
             window.clearTimeout(debounceRef.current);
@@ -80,6 +78,10 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
             }
         };
     }, [searchInput, onSearchChange]);
+
+    useEffect(() => {
+        setSearchInput(searchText);
+    }, [searchText]);
 
     return (
         <div style={{
@@ -110,7 +112,6 @@ const IssueBoardFilterActions: React.FC<IssueBoardFilterActionsProps> = ({
                             return (
                                 <Tooltip key={user.id} title={user.username}>
                                     <Avatar
-                                        src={`https://api.adorable.io/avatars/40/${user.username}.png`}
                                         style={{
                                             backgroundColor: bgColor,
                                             verticalAlign: "middle",

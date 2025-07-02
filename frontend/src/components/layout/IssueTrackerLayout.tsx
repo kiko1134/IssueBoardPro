@@ -23,7 +23,6 @@ const IssueTrackerLayout: React.FC<IssueTrackerLayoutProps> = ({onLogout}) => {
 
     return (
         <Layout style={{height: '100vh', overflow: 'hidden'}}>
-            {/* Header */}
             <Header style={{
                 backgroundColor: '#fff',
                 padding: '0 16px',

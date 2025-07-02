@@ -32,3 +32,8 @@ export const register = async ({ username, email, password }: RegisterParams) =>
     });
     return data;
 };
+
+export const fetchUsers = async () => {
+    const { data } = await http.get<User[]>('/users');
+    return data;
+}

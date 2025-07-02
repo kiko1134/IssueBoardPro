@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Avatar, Button, Input, List, message, Popconfirm, Space, Typography} from "antd";
+import {AutoComplete, Avatar, Button, List, message, Popconfirm, Space, Tooltip, Typography} from "antd";
 import {
     addProjectMember,
     deleteProjectMember,
@@ -7,7 +7,7 @@ import {
     fetchProjectMembers
 } from "../../api/services/projectService";
 import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
-import {User} from "../../api/services/userService";
+import {fetchUsers, User} from "../../api/services/userService";
 import {UserContext} from "../context/UserContext";
 
 interface MembersPageProps {
@@ -17,8 +17,10 @@ interface MembersPageProps {
 
 const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
     const [members, setMembers] = useState<any[]>([]);
+    const [allUsers, setAllUsers] = useState<User[]>([]);
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
     const [isAdmin, setIsAdmin] = useState(false);
+    const [adminId, setAdminId] = useState<number | null>(null);
 
     const {user} = React.useContext(UserContext);
 
@@ -29,10 +31,18 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
 
         fetchProjectDetails(projectId)
             .then((proj) => {
+                setAdminId(proj.adminId);
                 setIsAdmin(proj.adminId === user?.id);
             })
             .catch(() => message.error('Failed to load project info'));
     }, [projectId, user?.id]);
+
+    // Load all users for autocomplete
+    useEffect(() => {
+        fetchUsers()
+            .then(setAllUsers)
+            .catch(() => message.error("Failed to load users list"));
+    }, []);
 
     const handleAdd = () => {
         addProjectMember(projectId, {email: newMemberEmail})
@@ -52,6 +62,29 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
             })
             .catch(() => message.error('Failed to remove member'));
     };
+
+    const filteredOptions = allUsers
+        .filter((u) => u.id !== adminId)
+        .filter((u) => !members.some((m) => m.id === u.id))
+        .filter((u) =>
+            u.email.toLowerCase().includes(newMemberEmail.toLowerCase())
+        )
+        .map((u) => ({
+            value: u.email,
+            label: (
+                <Tooltip title={u.email} placement={"right"}>
+                <Space>
+                    <Avatar
+                        size="small"
+                        style={{backgroundColor: AVATAR_COLORS[u.id % AVATAR_COLORS.length]}}
+                    >
+                        {u.username[0].toUpperCase()}
+                    </Avatar>
+                    <Typography.Text ellipsis={{tooltip: true}}>{u.username}</Typography.Text>
+                </Space>
+                </Tooltip>
+            ),
+        }));
 
 
     return (
@@ -104,15 +137,35 @@ const MembersPage: React.FC<MembersPageProps> = ({projectId}) => {
                     );
                 }}
             />
+            {/*{isAdmin && (*/}
+            {/*    <Space style={{marginTop: 24}}>*/}
+            {/*        <Input*/}
+            {/*            placeholder="User email"*/}
+            {/*            value={newMemberEmail}*/}
+            {/*            onChange={(e) => setNewMemberEmail(e.target.value)}*/}
+            {/*            style={{width: 240}}*/}
+            {/*        />*/}
+            {/*        <Button type="primary" onClick={handleAdd} disabled={!newMemberEmail.trim()}>*/}
+            {/*            Add Member*/}
+            {/*        </Button>*/}
+            {/*    </Space>*/}
+            {/*)}*/}
             {isAdmin && (
                 <Space style={{marginTop: 24}}>
-                    <Input
-                        placeholder="User email"
-                        value={newMemberEmail}
-                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                    <AutoComplete
                         style={{width: 240}}
+                        options={filteredOptions}
+                        value={newMemberEmail}
+                        onSearch={setNewMemberEmail}
+                        onSelect={(value) => setNewMemberEmail(value)}
+                        placeholder="User email"
+                        filterOption={false}
                     />
-                    <Button type="primary" onClick={handleAdd} disabled={!newMemberEmail.trim()}>
+                    <Button
+                        type="primary"
+                        onClick={handleAdd}
+                        disabled={!newMemberEmail.trim()}
+                    >
                         Add Member
                     </Button>
                 </Space>

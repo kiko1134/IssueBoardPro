@@ -33,24 +33,6 @@ const HeaderContent: React.FC<HeaderContentProps> = ({onProjectSelect, onLogout}
     const [form] = Form.useForm();
     const [profileOpen, setProfileOpen] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    //
-    // let username = 'User';
-    // let email = 'user@example.com';
-    // let id = 0;
-    //
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //     try {
-    //         const decoded = jwtDecode<any>(token);
-    //         if (decoded.username) username = decoded.username;
-    //         if (decoded.email) email = decoded.email;
-    //         if (decoded.id) id = decoded.id;
-    //     } catch (err) {
-    //         console.warn('Invalid token');
-    //     }
-    // }
-    //
-    // const firstLetter = username.charAt(0).toUpperCase();
 
 
     useEffect(() => {
