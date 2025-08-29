@@ -2,10 +2,10 @@ import React, {useState} from 'react';
 import {Layout} from 'antd';
 import HeaderContent from "../layout/HeaderContent";
 import SiderContent from "../layout/SiderContent";
-import IssueBoardIndexPage from "../issueBoard/IssueBoardIndexPage";
 import {FundProjectionScreenOutlined} from "@ant-design/icons";
 import MembersPage from "../members/MembersPage";
 import WorklogSection from "../worklog/WorklogSection";
+import IssueBoardIndexPageMobx from "../issueBoard/IssueBoardIndexPageMobx";
 
 const {Header, Sider, Content} = Layout;
 
@@ -61,7 +61,7 @@ const IssueTrackerLayout: React.FC<IssueTrackerLayoutProps> = ({onLogout}) => {
                         ) : activeMenuKey === 'worklog' ? (
                             <WorklogSection projectId={projectIdNum}/>
                         ) : (
-                            <IssueBoardIndexPage projectId={projectIdNum}/>
+                            <IssueBoardIndexPageMobx projectId={projectIdNum}/>
                         )}
                     </Content>
                 </Layout>
