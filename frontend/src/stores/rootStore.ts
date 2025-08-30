@@ -4,6 +4,7 @@ import { ColumnStore } from "./ColumnStore";
 import { TaskStore } from "./TaskStore";
 import {ProjectStore} from "./ProjectStore";
 import {UserStore} from "./UserStore";
+import {WorklogStore} from "./WorklogStore";
 
 export class RootStore {
     ui = new BoardUIStore(this);
@@ -11,6 +12,7 @@ export class RootStore {
     tasks = new TaskStore(this);
     projects = new ProjectStore();
     user = new UserStore();
+    worklog = new WorklogStore();
 }
 
 const root = new RootStore();
@@ -22,5 +24,6 @@ export const useColumns = () => useRoot().columns;
 export const useTasks = () => useRoot().tasks;
 export const useProjects = () => useRoot().projects;
 export const useUser = () => useRoot().user;
+export const useWorklog = () => useRoot().worklog;
 
 export default root;

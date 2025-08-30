@@ -1,8 +1,9 @@
 import React, {useEffect} from "react";
 import {Button, Form, Input, InputNumber, message, Modal, Select} from "antd";
-import {fetchTaskWorklog, logWork, Task as TaskModel, updateTask} from "../../api/services/issueService";
+import {Task as TaskModel} from "../../api/services/issueService";
 import {fetchProjectMembers} from "../../api/services/projectService";
 import {User} from "../../api/services/userService";
+import {useTasks} from "../../stores/rootStore";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -22,6 +23,8 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
     const [newHours, setNewHours] = React.useState<number>(0);
     const [newMinutes, setNewMinutes] = React.useState<number>(0);
 
+    const tasks = useTasks();
+
     useEffect(() => {
         if (!issue) return;
         fetchProjectMembers(issue.projectId)
@@ -40,23 +43,32 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
                 assignedTo: issue.assignedTo,
                 assignedBy: issue.assignedBy,
             });
-            setWorkLogMinutes(0);
-            fetchTaskWorklog(issue.id)
-                .then(({totalMinutes}) => setWorkLogMinutes(totalMinutes))
-                .catch(() => message.error("Failed to load worklog"));
+            // setWorkLogMinutes(0);
+            // fetchTaskWorklog(issue.id)
+            //     .then(({totalMinutes}) => setWorkLogMinutes(totalMinutes))
+            //     .catch(() => message.error("Failed to load worklog"));
+            //
+
+            const cached = tasks.getTaskWorklog(issue.id);
+            if (cached > 0) {
+                setWorkLogMinutes(cached);
+            } else {
+                tasks.fetchTaskWorklog(issue.id)
+                    .then(setWorkLogMinutes)
+                    .catch(() => message.error("Failed to load worklog"));
+            }
 
             setNewHours(0);
             setNewMinutes(0);
         }
-    }, [issue, form]);
+    }, [issue, form, tasks]);
 
     if (!issue) return null;
 
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
-
-            const updated = await updateTask(issue.id, {
+            const updated = await tasks.update(issue.id, {
                 title: values.title,
                 description: values.description,
                 type: values.type,
@@ -77,8 +89,8 @@ const TicketModal: React.FC<TicketModalProps> = ({open, onClose, issue, onSave})
         const added = newHours * 60 + newMinutes;
         const workerId = form.getFieldValue("assignedTo") ?? issue.assignedTo;
         try {
-            const {totalMinutes} = await logWork(issue.id, workerId!,added);
-            setWorkLogMinutes(totalMinutes);
+            const total = await tasks.addWorklog(issue.id, workerId!, added);
+            setWorkLogMinutes(total);
             setNewHours(0);
             setNewMinutes(0);
             message.success("Worklog saved");

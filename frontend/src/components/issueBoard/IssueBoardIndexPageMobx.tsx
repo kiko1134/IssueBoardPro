@@ -11,7 +11,6 @@ interface IssueBoardIndexPageProps {
 const IssueBoardIndexPageMobx: React.FC<IssueBoardIndexPageProps> = observer(({ projectId }) => {
     const ui = useUI();
 
-    // синхронизираме projectId в UI store
     React.useEffect(() => { ui.setProjectId(projectId); }, [projectId,ui]);
 
     return (

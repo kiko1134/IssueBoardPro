@@ -52,11 +52,11 @@ const IssueTrackerLayoutMobx: React.FC<IssueTrackerLayoutProps> = observer(({ on
 
                     <Content style={{ padding: "10px" }}>
                         {ui.activeMenuKey === "members" ? (
-                            <MembersPage projectId={projectIdNum} />
+                            <MembersPage key={`members-${projectIdNum}`} projectId={projectIdNum} />
                         ) : ui.activeMenuKey === "worklog" ? (
-                            <WorklogSection projectId={projectIdNum} />
+                            <WorklogSection key={`worklog-${projectIdNum}`} projectId={projectIdNum} />
                         ) : (
-                            <IssueBoardIndexPageMobx projectId={projectIdNum} />
+                            <IssueBoardIndexPageMobx key={`board-${projectIdNum}`} projectId={projectIdNum} />
                         )}
                     </Content>
                 </Layout>

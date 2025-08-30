@@ -207,7 +207,6 @@ const HeaderContentMobx: React.FC<HeaderContentProps> = observer(({onProjectSele
                 </Popconfirm>
             </Dropdown>
 
-            {/* Create Modal */}
             <Modal title="Create New Project" open={createModalVisible} onCancel={closeModals} onOk={handleCreate}
                    okText="Create">
                 <Form form={form} layout="vertical">
@@ -219,7 +218,6 @@ const HeaderContentMobx: React.FC<HeaderContentProps> = observer(({onProjectSele
                 </Form>
             </Modal>
 
-            {/* Edit Modal */}
             <Modal title="Edit Project" open={editModalVisible} onCancel={closeModals} onOk={handleEditSave}
                    okText="Save">
                 <Form form={form} layout="vertical">
