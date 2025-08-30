@@ -2,7 +2,7 @@
 
 This repository contains a university project
 for [Web Technologies 2025](https://github.com/kiko1134/Web_Technologies_2025): an issue tracker web application built
-collaboratively using React with TypeScript (TSX) on the frontend, Express.js with TypeScript on the backend, and a
+collaboratively using React with TypeScript (TSX) and Mobx for state management on the frontend, Express.js with TypeScript on the backend, and a
 MySQL database.
 
 ## Table of Contents
@@ -28,10 +28,10 @@ MySQL database.
 
 ## Technologies
 
-- **Frontend:** React, TypeScript, HTML, CSS
+- **Frontend:** React, Mobx, TypeScript, HTML, CSS
 - **Backend:** Express.js, Node.js, TypeScript
 - **Database:** MySQL
-- **Tooling:** npm, ts-node, nodemon
+- **Tooling:** npm, ts-node, axios
 
 ## Project Structure
 
@@ -40,10 +40,9 @@ Web_Technologies_2025/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/         # Controllers for handling request logic
+│   │   ├── db/                  # Database connection and configuration
 │   │   ├── middlewares/         # Middleware functions (e.g., error handling)
-│   │   ├── models/              # Database models or ORM configurations
 │   │   ├── routes/              # Express routes for API endpoints
-│   │   ├── services/            # Business logic for issue operations
 │   │   ├── app.ts               # Express app configuration
 │   │   └── server.ts            # Server startup script
 │   ├── package.json
@@ -51,19 +50,19 @@ Web_Technologies_2025/
 │
 ├── frontend/
 │   ├── public/
-│   │   └── index.html         # HTML template
+│   │   └── img/                 # Static images
 │   ├── src/
-│   │   ├── components/        # Reusable React components (e.g., IssueForm, IssueList)
-│   │   ├── pages/             # Page components (e.g., Home, IssueDetail)
-│   │   ├── App.tsx            # Main application component
-│   │   └── index.tsx          # React entry point
+│   │   ├── api/                 # API interaction logic (e.g., axios instances)
+│   │   │   ├── services/        # Service functions for API calls
+│   │   │   └── https.ts         # Axios instance configuration
+│   │   ├── components/          # Reusable React components (e.g., IssueForm, IssueList)
+│   │   ├── App.tsx              # Main application component
+│   │   └── index.tsx            # React entry point
 │   ├── package.json
 │   └── tsconfig.json
-├── database/
-│   ├── schema.sql             # SQL script for creating database tables
-│   └── seed.sql               # SQL script for seeding initial data
-├── .gitignore                 # Global gitignore file for both frontend and backend
-└── README.md                  # Project documentation
+│
+├── .gitignore                   # Global gitignore file for both frontend and backend
+└── README.md                    # Project documentation
 
 ```
 
@@ -105,10 +104,10 @@ This project follows a structured Git workflow to maintain code quality and simp
 3. Start the development server:
 
     ```bash
-    npm run dev
+    npm start
     ```
 
-4. The server should now be running at `http://localhost:5000`.
+4. The server should now be running at `http://localhost:8888`.
 
 ### Frontend Setup
 
@@ -150,43 +149,68 @@ This project follows a structured Git workflow to maintain code quality and simp
   After merging feature branches into `dev` and completing testing, merge `dev` into `main` to deploy production-ready
   code.
 
-## Contributing
+[//]: # (## Contributing)
 
-1. Create a new branch for the feature you are working on:
+[//]: # ()
+[//]: # (1. Create a new branch for the feature you are working on:)
 
-    ```bash
-    git checkout -b feature/new-feature
-    ```
+[//]: # ()
+[//]: # (    ```bash)
 
-2. Make changes to the codebase and commit them:
+[//]: # (    git checkout -b feature/new-feature)
 
-    ```bash
-    git add .
-    git commit -m "Add new feature"
-    ```
+[//]: # (    ```)
 
-3. Push the changes to the remote repository:
+[//]: # ()
+[//]: # (2. Make changes to the codebase and commit them:)
 
-    ```bash
-    git push origin feature/new-feature
-    ```
+[//]: # ()
+[//]: # (    ```bash)
 
-4. Create a pull request on GitHub and request a code review.
+[//]: # (    git add .)
 
-5. Once approved, merge the changes into the `dev` branch:
+[//]: # (    git commit -m "Add new feature")
 
-    ```bash
-    git checkout dev
-    git merge feature/new-feature
-    ```
+[//]: # (    ```)
 
-6. Delete the feature branch:
+[//]: # ()
+[//]: # (3. Push the changes to the remote repository:)
 
-    ```bash
-    git branch -d feature/new-feature
-    ```
+[//]: # ()
+[//]: # (    ```bash)
 
-7. Repeat the process for each new feature or bug fix.
-8. When ready to deploy, merge the `dev` branch into `main`.
+[//]: # (    git push origin feature/new-feature)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (4. Create a pull request on GitHub and request a code review.)
+
+[//]: # ()
+[//]: # (5. Once approved, merge the changes into the `dev` branch:)
+
+[//]: # ()
+[//]: # (    ```bash)
+
+[//]: # (    git checkout dev)
+
+[//]: # (    git merge feature/new-feature)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (6. Delete the feature branch:)
+
+[//]: # ()
+[//]: # (    ```bash)
+
+[//]: # (    git branch -d feature/new-feature)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (7. Repeat the process for each new feature or bug fix.)
+
+[//]: # (8. When ready to deploy, merge the `dev` branch into `main`.)
 
 
