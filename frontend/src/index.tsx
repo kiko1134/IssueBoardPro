@@ -3,17 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import UserProvider from "./components/context/UserContext";
-import root, {RootStoreContext } from './stores/rootStore';
+import root, {RootStoreContext} from './stores/rootStore';
 
 const rootEl = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 rootEl.render(
     <RootStoreContext.Provider value={root}>
-    <UserProvider>
         <App/>
-    </UserProvider>
     </RootStoreContext.Provider>
 );
 

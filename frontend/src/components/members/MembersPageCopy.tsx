@@ -1,21 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {AutoComplete, Avatar, Button, List, message, Popconfirm, Space, Tooltip, Typography} from "antd";
-import {
-    addProjectMember,
-    deleteProjectMember,
-    fetchProjectDetails,
-    fetchProjectMembers
-} from "../../api/services/projectService";
-import {AVATAR_COLORS} from "../issueBoard/IssueBoardFilterActions";
-import {fetchUsers, User} from "../../api/services/userService";
-import {observer} from "mobx-react-lite";
-import {useUser} from "../../stores/rootStore";
+import React, { useEffect, useState } from "react";
+import { AutoComplete, Avatar, Button, List, message, Popconfirm, Space, Tooltip, Typography } from "antd";
+import { addProjectMember, deleteProjectMember, fetchProjectDetails, fetchProjectMembers } from "../../api/services/projectService";
+import { AVATAR_COLORS } from "../issueBoard/IssueBoardFilterActions";
+import { fetchUsers, User } from "../../api/services/userService";
+import { observer } from "mobx-react-lite";
+import { useUser } from "../../stores/rootStore";
 
-interface MembersPageProps {
-    projectId: number;
-}
+interface MembersPageProps { projectId: number; }
 
-const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
+const MembersPage: React.FC<MembersPageProps> = observer(({ projectId }) => {
     const [members, setMembers] = useState<any[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
@@ -44,7 +37,7 @@ const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
     }, []);
 
     const handleAdd = () => {
-        addProjectMember(projectId, {email: newMemberEmail})
+        addProjectMember(projectId, { email: newMemberEmail })
             .then((member) => {
                 setMembers([...members, member]);
                 setNewMemberEmail("");
@@ -71,17 +64,17 @@ const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
             label: (
                 <Tooltip title={u.email} placement="right">
                     <Space>
-                        <Avatar size="small" style={{backgroundColor: AVATAR_COLORS[u.id % AVATAR_COLORS.length]}}>
+                        <Avatar size="small" style={{ backgroundColor: AVATAR_COLORS[u.id % AVATAR_COLORS.length] }}>
                             {u.username[0].toUpperCase()}
                         </Avatar>
-                        <Typography.Text ellipsis={{tooltip: true}}>{u.username}</Typography.Text>
+                        <Typography.Text ellipsis={{ tooltip: true }}>{u.username}</Typography.Text>
                     </Space>
                 </Tooltip>
             ),
         }));
 
     return (
-        <div style={{padding: 16}}>
+        <div style={{ padding: 16 }}>
             <Typography.Title level={4}>Project Members</Typography.Title>
 
             <List<User>
@@ -107,10 +100,7 @@ const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
                             }
                         >
                             <List.Item.Meta
-                                avatar={<Avatar style={{
-                                    backgroundColor: color,
-                                    verticalAlign: "middle"
-                                }}>{c_user.username.charAt(0).toUpperCase()}</Avatar>}
+                                avatar={<Avatar style={{ backgroundColor: color, verticalAlign: "middle" }}>{c_user.username.charAt(0).toUpperCase()}</Avatar>}
                                 title={<Typography.Text strong>{c_user.username}</Typography.Text>}
                                 description={<Typography.Text type="secondary">{c_user.email}</Typography.Text>}
                             />
@@ -120,9 +110,9 @@ const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
             />
 
             {isAdmin && (
-                <Space style={{marginTop: 24}}>
+                <Space style={{ marginTop: 24 }}>
                     <AutoComplete
-                        style={{width: 240}}
+                        style={{ width: 240 }}
                         options={filteredOptions}
                         value={newMemberEmail}
                         onSearch={setNewMemberEmail}
@@ -140,4 +130,3 @@ const MembersPage: React.FC<MembersPageProps> = observer(({projectId}) => {
 });
 
 export default MembersPage;
-

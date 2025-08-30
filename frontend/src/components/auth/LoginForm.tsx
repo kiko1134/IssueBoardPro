@@ -1,69 +1,61 @@
-import React, {useContext, useState} from 'react';
-import {Button, Card, Form, Input, message, Typography} from 'antd';
-import {login} from "../../api/services/userService";
-import {UserContext} from "../context/UserContext";
+import React, { useState } from "react";
+import { Button, Card, Form, Input, message, Typography } from "antd";
+import { observer } from "mobx-react-lite";
+import { useUser } from "../../stores/rootStore";
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 interface LoginFormProps {
     onLoginSuccess: () => void;
     onSwitchToRegister?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister}) => {
+const LoginForm: React.FC<LoginFormProps> = observer(({ onLoginSuccess, onSwitchToRegister }) => {
     const [loading, setLoading] = useState(false);
-    const { refreshUser } = useContext(UserContext);
+    const user = useUser();
 
-    const onFinish = async (values: { email: string, password: string }) => {
-
+    const onFinish = async (values: { email: string; password: string }) => {
         setLoading(true);
         try {
-            const {username} = await login(values);
-            await refreshUser(); //зареждаме текущия потребител
-            message.success('Welcome back, ' + username);
+            const { username } = await user.login(values);
+            message.success("Welcome back, " + (username ?? user.user?.username ?? ""));
             onLoginSuccess();
         } catch (error: any) {
-            message.error(error?.response?.data?.message || 'Login failed');
+            message.error(error?.response?.data?.message || "Login failed");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div style={{
-            height: '100vh',
+            height: "100vh",
             backgroundImage: 'url("/img/login_background_2.webp")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '16px',
-            overflow: 'hidden'
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "16px",
+            overflow: "hidden",
         }}>
-            <Card style={{
-                maxWidth: 380,
-                width: '100%',
-                padding: '24px',
-                borderRadius: 8,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-            }}>
-                <Title level={2} style={{textAlign: 'center', marginBottom: '24px'}}>Welcome Back</Title>
+            <Card style={{ maxWidth: 380, width: "100%", padding: "24px", borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+                <Title level={2} style={{ textAlign: "center", marginBottom: "24px" }}>Welcome Back</Title>
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item name="email" label="Email" rules={[
-                        {required: true, type: 'email'},
-                        /* eslint-disable-next-line no-control-regex */
-                        {pattern: /^[\x00-\x7F]+$/, message: 'Email must contain only English characters' }
-                        ]}>
-                        <Input placeholder="Enter your email"/>
+                        { required: true, type: "email" },
+                        // eslint-disable-next-line
+                        { pattern: /^[\x00-\x7F]+$/, message: "Email must contain only English characters" }
+                    ]}>
+                        <Input placeholder="Enter your email" />
                     </Form.Item>
 
                     <Form.Item name="password" label="Password" rules={[
-                        {required: true, min: 6},
-                        /* eslint-disable-next-line no-control-regex */
-                        { pattern: /^[\x00-\x7F]+$/, message: 'Password must contain only English characters' }
+                        { required: true, min: 6 },
+                        // eslint-disable-next-line
+                        { pattern: /^[\x00-\x7F]+$/, message: "Password must contain only English characters" }
                     ]}>
-                        <Input.Password placeholder="Enter your password"/>
+                        <Input.Password placeholder="Enter your password" />
                     </Form.Item>
 
                     <Form.Item>
@@ -74,16 +66,14 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginSuccess, onSwitchToRegister
                 </Form>
 
                 {onSwitchToRegister && (
-                    <div style={{ textAlign: 'center', marginTop: 16 }}>
-                        <span style={{ color: 'rgba(0,0,0,0.45)' }}>Don't have an account? </span>
-                        <Button type="link" onClick={onSwitchToRegister}>
-                            Register here
-                        </Button>
+                    <div style={{ textAlign: "center", marginTop: 16 }}>
+                        <span style={{ color: "rgba(0,0,0,0.45)" }}>Don't have an account? </span>
+                        <Button type="link" onClick={onSwitchToRegister}>Register here</Button>
                     </div>
                 )}
             </Card>
         </div>
     );
-};
+});
 
 export default LoginForm;
